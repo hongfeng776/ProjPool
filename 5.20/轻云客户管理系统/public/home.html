@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页 - 轻云客户管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="home-container">
+        <header class="home-header">
+            <div class="logo">轻云CRM</div>
+            <div class="user-info">
+                <span id="welcomeUser">欢迎，用户</span>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+        </header>
+        <main class="home-content">
+            <div class="welcome-section">
+                <h2>欢迎使用轻云客户管理系统</h2>
+                <p>高效管理您的客户资源，提升业务效率</p>
+            </div>
+            <div class="cards-grid">
+                <div class="card" onclick="window.location.href='/customers'">
+                    <div class="card-icon">👥</div>
+                    <h3>客户管理</h3>
+                    <p>管理客户信息，跟踪客户动态</p>
+                </div>
+                <div class="card" onclick="window.location.href='/statistics'">
+                    <div class="card-icon">📊</div>
+                    <h3>数据统计</h3>
+                    <p>查看销售漏斗，分析业绩趋势</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📝</div>
+                    <h3>跟进记录</h3>
+                    <p>记录客户跟进情况，持续跟踪</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">⚙️</div>
+                    <h3>系统设置</h3>
+                    <p>个性化配置，优化使用体验</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="js/auth.js"></script>
+    <script>
+        function checkAuth() {
+            const user = localStorage.getItem('user');
+            if (!user) {
+                window.location.href = '/login';
+                return;
+            }
+            const userData = JSON.parse(user);
+            document.getElementById('welcomeUser').textContent = `欢迎，${userData.username}`;
+        }
+        
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+        
+        checkAuth();
+    </script>
+</body>
+</html>

@@ -357,7 +357,7 @@ class BlockGame {
         while (this.hasInitialMatches()) {
             for (let row = 0; row < this.rows; row++) {
                 for (let col = 0; col < this.cols; col++) {
-                    if (this.findConnectedBlocks(row, col).length >= 2) {
+                    if (this.findConnectedBlocks(row, col).length >= 3) {
                         this.board[row][col] = Math.floor(Math.random() * this.colors);
                     }
                 }
@@ -368,7 +368,7 @@ class BlockGame {
     hasInitialMatches() {
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
-                if (this.findConnectedBlocks(row, col).length >= 2) {
+                if (this.findConnectedBlocks(row, col).length >= 3) {
                     return true;
                 }
             }
@@ -399,7 +399,7 @@ class BlockGame {
         if (this.isAnimating) return;
 
         const connectedBlocks = this.findConnectedBlocks(row, col);
-        if (connectedBlocks.length >= 2) {
+        if (connectedBlocks.length >= 3) {
             this.sound.playPop();
             connectedBlocks.forEach(([r, c]) => {
                 const block = this.getBlockElement(r, c);
@@ -423,9 +423,11 @@ class BlockGame {
         if (this.isAnimating) return;
 
         const connectedBlocks = this.findConnectedBlocks(row, col);
-        if (connectedBlocks.length >= 2) {
+        if (connectedBlocks.length >= 3) {
             this.isAnimating = true;
-            this.increaseCombo();
+            this.clearHoverPreview();
+            this.combo = 1;
+            this.showCombo();
             await this.performElimination(connectedBlocks);
 
             if (this.score >= this.levels[this.currentLevel - 1].targetScore) {
@@ -456,8 +458,12 @@ class BlockGame {
     }
 
     showCombo() {
-        if (this.comboElement && this.combo > 1) {
-            this.comboElement.textContent = `${this.combo}连击!`;
+        if (this.comboElement) {
+            if (this.combo > 1) {
+                this.comboElement.textContent = `${this.combo}连击!`;
+            } else {
+                this.comboElement.textContent = '消除!';
+            }
             this.comboElement.style.display = 'block';
             this.comboElement.style.animation = 'none';
             this.comboElement.offsetHeight;
@@ -473,14 +479,28 @@ class BlockGame {
 
     async performElimination(blocks) {
         await this.removeBlocksWithAnimation(blocks);
-        await this.applyGravityWithAnimation();
-        await this.fillEmptyBlocksWithAnimation();
+        await this.applyGravity();
+        await this.fillEmptyBlocks();
+        await this.processChainReaction();
+    }
 
-        const newMatches = this.findAllMatches();
-        if (newMatches.length > 0) {
+    async processChainReaction() {
+        let hasMatches = true;
+        while (hasMatches) {
+            const newMatches = this.findAllMatches();
+            if (newMatches.length === 0) {
+                hasMatches = false;
+                break;
+            }
+
             this.increaseCombo();
             await this.delay(200);
-            await this.performElimination(newMatches[0]);
+
+            for (const match of newMatches) {
+                await this.removeBlocksWithAnimation(match);
+            }
+            await this.applyGravity();
+            await this.fillEmptyBlocks();
         }
     }
 
@@ -493,7 +513,7 @@ class BlockGame {
                 const key = `${row},${col}`;
                 if (!visited.has(key) && this.board[row][col] !== null) {
                     const connected = this.findConnectedBlocks(row, col);
-                    if (connected.length >= 2) {
+                    if (connected.length >= 3) {
                         allMatches.push(connected);
                         connected.forEach(([r, c]) => visited.add(`${r},${c}`));
                     }
@@ -533,8 +553,9 @@ class BlockGame {
     }
 
     async removeBlocksWithAnimation(blocks) {
-        const basePoints = blocks.length * blocks.length * 10;
-        const comboMultiplier = 1 + (this.combo - 1) * 0.5;
+        const blockCount = blocks.length;
+        const basePoints = blockCount * 10 + Math.max(0, (blockCount - 3) * 20);
+        const comboMultiplier = 1 + (this.combo - 1) * 0.3;
         const points = Math.floor(basePoints * comboMultiplier);
         this.score += points;
 
@@ -546,14 +567,15 @@ class BlockGame {
         this.showScorePopup(blocks, points);
         this.sound.playEliminate();
 
-        blocks.forEach(([row, col]) => {
+        blocks.sort((a, b) => a[0] - b[0]).forEach(([row, col], index) => {
             const block = this.getBlockElement(row, col);
             if (block) {
                 block.classList.add('removing');
+                block.style.animationDelay = `${index * 25}ms`;
             }
         });
 
-        await this.delay(300);
+        await this.delay(350);
 
         blocks.forEach(([row, col]) => {
             this.board[row][col] = null;
@@ -575,14 +597,17 @@ class BlockGame {
         setTimeout(() => popup.remove(), 1000);
     }
 
-    async applyGravityWithAnimation() {
+    async applyGravity() {
         let moved = false;
+        const fallDistances = new Map();
+        const oldBoard = JSON.parse(JSON.stringify(this.board));
 
         for (let col = 0; col < this.cols; col++) {
             let emptyRow = this.rows - 1;
             for (let row = this.rows - 1; row >= 0; row--) {
                 if (this.board[row][col] !== null) {
                     if (row !== emptyRow) {
+                        fallDistances.set(`${row},${col}`, emptyRow - row);
                         this.board[emptyRow][col] = this.board[row][col];
                         this.board[row][col] = null;
                         moved = true;
@@ -595,21 +620,25 @@ class BlockGame {
         if (moved) {
             this.renderBoard();
             const blocks = document.querySelectorAll('.block');
-            blocks.forEach((block, index) => {
+            blocks.forEach((block) => {
+                const row = parseInt(block.dataset.row);
+                const col = parseInt(block.dataset.col);
                 block.classList.add('falling');
-                block.style.animationDelay = `${index % this.cols * 30}ms`;
+                block.style.animationDelay = `${col * 15}ms`;
             });
             await this.delay(300);
         }
     }
 
-    async fillEmptyBlocksWithAnimation() {
+    async fillEmptyBlocks() {
         let hasEmpty = false;
+        const newBlocks = [];
 
         for (let col = 0; col < this.cols; col++) {
             for (let row = 0; row < this.rows; row++) {
                 if (this.board[row][col] === null) {
                     this.board[row][col] = Math.floor(Math.random() * this.colors);
+                    newBlocks.push([row, col]);
                     hasEmpty = true;
                 }
             }
@@ -617,10 +646,12 @@ class BlockGame {
 
         if (hasEmpty) {
             this.renderBoard();
-            const blocks = document.querySelectorAll('.block');
-            blocks.forEach((block, index) => {
-                block.classList.add('appearing');
-                block.style.animationDelay = `${index * 10}ms`;
+            newBlocks.forEach(([row, col]) => {
+                const block = this.getBlockElement(row, col);
+                if (block) {
+                    block.classList.add('appearing');
+                    block.style.animationDelay = `${col * 15 + (this.rows - row) * 10}ms`;
+                }
             });
             await this.delay(300);
         }
@@ -634,7 +665,7 @@ class BlockGame {
         for (let row = 0; row < this.rows; row++) {
             for (let col = 0; col < this.cols; col++) {
                 if (this.board[row][col] !== null && 
-                    this.findConnectedBlocks(row, col).length >= 2) {
+                    this.findConnectedBlocks(row, col).length >= 3) {
                     return false;
                 }
             }

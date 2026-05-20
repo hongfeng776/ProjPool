@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户管理 - 轻云客户管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="customer-container">
+        <header class="customer-header">
+            <div class="logo" onclick="window.location.href='/home'">轻云CRM</div>
+            <nav class="customer-nav">
+                <a href="/home">首页</a>
+                <a href="/customers" class="active">客户管理</a>
+            </nav>
+            <div class="user-info">
+                <span id="welcomeUser">欢迎，用户</span>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+        </header>
+        <main class="customer-content">
+            <div class="customer-header-bar">
+                <h1>客户档案</h1>
+                <div class="header-actions">
+                    <div class="stage-filter">
+                        <label>阶段筛选:</label>
+                        <select id="stageFilter" onchange="loadCustomers()">
+                            <option value="">全部</option>
+                            <option value="lead">线索</option>
+                            <option value="contact">接触</option>
+                            <option value="demand">需求确认</option>
+                            <option value="proposal">方案报价</option>
+                            <option value="negotiation">商务谈判</option>
+                            <option value="deal">成交</option>
+                        </select>
+                    </div>
+                    <button class="btn-secondary" onclick="exportCustomers('json')">导出 JSON</button>
+                    <button class="btn-primary" onclick="openAddModal()">+ 新增客户</button>
+                </div>
+            </div>
+            <div id="message"></div>
+            <div class="customer-table">
+                <div class="table-header">
+                    <div>客户姓名</div>
+                    <div>联系电话</div>
+                    <div>公司名称</div>
+                    <div>阶段</div>
+                    <div>创建时间</div>
+                    <div>操作</div>
+                </div>
+                <div id="customerList">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="addModal" class="form-modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>新增客户</h2>
+                <button class="close-btn" onclick="closeAddModal()">&times;</button>
+            </div>
+            <form id="customerForm" class="customer-form">
+                <div class="form-group">
+                    <label for="customerName">客户姓名 <span style="color: red;">*</span></label>
+                    <input type="text" id="customerName" name="name" required placeholder="请输入客户姓名">
+                </div>
+                <div class="form-group">
+                    <label for="customerPhone">联系电话 <span style="color: red;">*</span></label>
+                    <input type="tel" id="customerPhone" name="phone" required placeholder="请输入联系电话">
+                </div>
+                <div class="form-group">
+                    <label for="customerEmail">邮箱</label>
+                    <input type="email" id="customerEmail" name="email" placeholder="请输入邮箱地址">
+                </div>
+                <div class="form-group">
+                    <label for="customerCompany">公司名称</label>
+                    <input type="text" id="customerCompany" name="company" placeholder="请输入公司名称">
+                </div>
+                <div class="form-group">
+                    <label for="customerAddress">地址</label>
+                    <input type="text" id="customerAddress" name="address" placeholder="请输入地址">
+                </div>
+                <div class="form-group">
+                    <label for="customerNotes">备注</label>
+                    <textarea id="customerNotes" name="notes" placeholder="请输入备注信息"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="customerStage">客户阶段</label>
+                    <select id="customerStage" name="stage">
+                        <option value="lead">线索</option>
+                        <option value="contact">接触</option>
+                        <option value="demand">需求确认</option>
+                        <option value="proposal">方案报价</option>
+                        <option value="negotiation">商务谈判</option>
+                        <option value="deal">成交</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeAddModal()">取消</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/customers.js"></script>
+    <script>
+        function checkAuth() {
+            const user = localStorage.getItem('user');
+            if (!user) {
+                window.location.href = '/login';
+                return;
+            }
+            const userData = JSON.parse(user);
+            document.getElementById('welcomeUser').textContent = `欢迎，${userData.username}`;
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户详情 - 轻云客户管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="customer-container">
+        <header class="customer-header">
+            <div class="logo" onclick="window.location.href='/home'">轻云CRM</div>
+            <nav class="customer-nav">
+                <a href="/home">首页</a>
+                <a href="/customers">客户管理</a>
+                <a href="/customer" class="active" id="navCustomerDetail">客户详情</a>
+            </nav>
+            <div class="user-info">
+                <span id="welcomeUser">欢迎，用户</span>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+        </header>
+        <main class="customer-content">
+            <div class="page-header">
+                <h1 id="customerName">客户详情</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="window.location.href='/customers'">返回列表</button>
+                    <button class="btn-primary" onclick="openFollowupModal()">+ 添加跟进</button>
+                </div>
+            </div>
+            
+            <div id="message"></div>
+
+            <div class="customer-detail-card">
+                <div class="detail-section">
+                    <h3>基本信息</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="label">客户姓名</span>
+                            <span class="value" id="detailName">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">联系电话</span>
+                            <span class="value" id="detailPhone">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">邮箱</span>
+                            <span class="value" id="detailEmail">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">公司名称</span>
+                            <span class="value" id="detailCompany">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">地址</span>
+                            <span class="value" id="detailAddress">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">客户阶段</span>
+                            <span class="value" id="detailStage">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">创建时间</span>
+                            <span class="value" id="detailCreated">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="detail-section">
+                    <h3>备注信息</h3>
+                    <p id="detailNotes" class="notes-text">-</p>
+                </div>
+            </div>
+
+            <div class="customer-detail-card" style="margin-top: 20px;">
+                <div class="detail-section">
+                    <h3>更新客户信息</h3>
+                    <form id="updateForm" class="customer-form">
+                        <div class="detail-grid">
+                            <div class="form-group">
+                                <label for="updateName">客户姓名</label>
+                                <input type="text" id="updateName" name="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="updatePhone">联系电话</label>
+                                <input type="text" id="updatePhone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="updateEmail">邮箱</label>
+                                <input type="email" id="updateEmail" name="email">
+                            </div>
+                            <div class="form-group">
+                                <label for="updateCompany">公司名称</label>
+                                <input type="text" id="updateCompany" name="company">
+                            </div>
+                            <div class="form-group">
+                                <label for="updateAddress">地址</label>
+                                <input type="text" id="updateAddress" name="address">
+                            </div>
+                            <div class="form-group">
+                                <label for="updateStage">客户阶段</label>
+                                <select id="updateStage" name="stage">
+                                    <option value="lead">线索</option>
+                                    <option value="contact">接触</option>
+                                    <option value="demand">需求确认</option>
+                                    <option value="proposal">方案报价</option>
+                                    <option value="negotiation">商务谈判</option>
+                                    <option value="deal">成交</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="updateNotes">备注</label>
+                            <textarea id="updateNotes" name="notes" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions" style="justify-content: flex-end; margin-top: 20px;">
+                            <button type="submit" class="btn-primary">更新信息</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="followups-section">
+                <h2>跟进记录</h2>
+                <div id="followupsList">
+                    <div class="empty-state">
+                        <div class="icon">📝</div>
+                        <p>暂无跟进记录，点击"添加跟进"创建第一条记录</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="followupModal" class="form-modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加跟进记录</h2>
+                <button class="close-btn" onclick="closeFollowupModal()">&times;</button>
+            </div>
+            <form id="followupForm" class="customer-form">
+                <div class="form-group">
+                    <label for="followupType">跟进方式 <span style="color: red;">*</span></label>
+                    <select id="followupType" name="type" required>
+                        <option value="电话">电话</option>
+                        <option value="微信">微信</option>
+                        <option value="邮件">邮件</option>
+                        <option value="面谈">面谈</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="followupContent">跟进内容 <span style="color: red;">*</span></label>
+                    <textarea id="followupContent" name="content" required placeholder="请输入跟进内容..." rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="nextFollowDate">下次跟进时间</label>
+                    <input type="date" id="nextFollowDate" name="nextFollowDate">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeFollowupModal()">取消</button>
+                    <button type="submit" class="btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/customer-detail.js"></script>
+    <script>
+        function checkAuth() {
+            const user = localStorage.getItem('user');
+            if (!user) {
+                window.location.href = '/login';
+                return;
+            }
+            const userData = JSON.parse(user);
+            document.getElementById('welcomeUser').textContent = `欢迎，${userData.username}`;
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

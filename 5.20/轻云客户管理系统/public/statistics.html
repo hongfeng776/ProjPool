@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据统计 - 轻云客户管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="customer-container">
+        <header class="customer-header">
+            <div class="logo" onclick="window.location.href='/home'">轻云CRM</div>
+            <nav class="customer-nav">
+                <a href="/home">首页</a>
+                <a href="/customers">客户管理</a>
+                <a href="/statistics" class="active">数据统计</a>
+            </nav>
+            <div class="user-info">
+                <span id="welcomeUser">欢迎，用户</span>
+                <button class="logout-btn" onclick="logout()">退出登录</button>
+            </div>
+        </header>
+        <main class="customer-content">
+            <div class="page-header">
+                <h1>数据统计</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="exportData('json')">导出 JSON</button>
+                    <button class="btn-primary" onclick="exportData('csv')">导出 CSV</button>
+                </div>
+            </div>
+            
+            <div id="message"></div>
+
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalCustomers">0</div>
+                        <div class="stat-label">总客户数</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="dealCustomers">0</div>
+                        <div class="stat-label">成交客户</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="conversionRate">0%</div>
+                        <div class="stat-label">转化率</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="funnel-section">
+                <h2>销售漏斗</h2>
+                <div class="funnel-container" id="funnelContainer">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/statistics.js"></script>
+    <script>
+        function checkAuth() {
+            const user = localStorage.getItem('user');
+            if (!user) {
+                window.location.href = '/login';
+                return;
+            }
+            const userData = JSON.parse(user);
+            document.getElementById('welcomeUser').textContent = `欢迎，${userData.username}`;
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>
