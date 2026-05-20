@@ -1,0 +1,63 @@
+.app-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1a1a2e;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+  border-bottom: 1px solid #0f3460;
+}
+
+.app-header h1 {
+  color: #e94560;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.header-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.view-mode-switch,
+.edit-mode-switch {
+  display: flex;
+  gap: 8px;
+}
+
+.view-mode-switch button,
+.edit-mode-switch button {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #0f3460;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.view-mode-switch button:hover,
+.edit-mode-switch button:hover {
+  background: #1a5276;
+}
+
+.view-mode-switch button.active,
+.edit-mode-switch button.active {
+  background: #e94560;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
