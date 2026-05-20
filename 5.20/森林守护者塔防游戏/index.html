@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>森林守护者 - 塔防游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <div id="main-menu" class="screen active">
+            <div class="menu-content">
+                <h1 class="game-title">🌲 森林守护者 🌲</h1>
+                <p class="game-subtitle">保卫你的森林家园</p>
+                <div class="menu-buttons">
+                    <button id="start-btn" class="menu-btn">开始游戏</button>
+                    <button id="how-to-play-btn" class="menu-btn">游戏说明</button>
+                    <button id="settings-btn" class="menu-btn">游戏设置</button>
+                </div>
+            </div>
+            <div class="forest-decoration"></div>
+        </div>
+
+        <div id="level-select" class="screen">
+            <div class="level-content">
+                <h2 class="level-title">选择关卡</h2>
+                <div id="levels-grid" class="levels-grid">
+                </div>
+                <button id="back-btn" class="back-btn">返回主菜单</button>
+            </div>
+        </div>
+
+        <div id="how-to-play" class="screen">
+            <div class="info-content">
+                <h2 class="info-title">游戏说明</h2>
+                <div class="info-text">
+                    <p>🏰 建造防御塔保护森林</p>
+                    <p>👹 阻止敌人入侵</p>
+                    <p>💰 消灭敌人获得金币</p>
+                    <p>⬆️ 升级防御塔增强火力</p>
+                </div>
+                <button id="back-from-info-btn" class="back-btn">返回</button>
+            </div>
+        </div>
+
+        <div id="settings" class="screen">
+            <div class="settings-content">
+                <h2 class="settings-title">游戏设置</h2>
+                <div class="settings-options">
+                    <div class="setting-item">
+                        <label>音效音量</label>
+                        <input type="range" id="sound-volume" min="0" max="100" value="50">
+                    </div>
+                    <div class="setting-item">
+                        <label>音乐音量</label>
+                        <input type="range" id="music-volume" min="0" max="100" value="50">
+                    </div>
+                </div>
+                <button id="back-from-settings-btn" class="back-btn">返回</button>
+            </div>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <canvas id="game-canvas"></canvas>
+            <div id="game-ui">
+                <div class="game-stats">
+                    <span>生命: <span id="lives">20</span> ❤️</span>
+                    <span>金币: <span id="gold">100</span> 💰</span>
+                    <span>波次: <span id="wave">1</span>/10</span>
+                </div>
+                <button id="pause-btn">暂停</button>
+                <button id="back-from-game-btn">退出</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/game.js"></script>
+</body>
+</html>

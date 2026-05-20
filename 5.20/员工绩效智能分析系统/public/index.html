@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>员工绩效智能分析系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>员工绩效智能分析系统</h1>
+            <nav>
+                <button class="nav-btn active" data-tab="dashboard">综合仪表盘</button>
+                <button class="nav-btn" data-tab="employees">员工信息管理</button>
+                <button class="nav-btn" data-tab="kpi">KPI指标配置</button>
+                <button class="nav-btn" data-tab="performance">绩效考核录入</button>
+                <button class="nav-btn" data-tab="statistics">统计分析</button>
+            </nav>
+        </header>
+
+        <main>
+            <section id="dashboard" class="tab-content active">
+                <div class="section-header">
+                    <h2>综合仪表盘</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="exportToExcel()">导出Excel</button>
+                        <button class="btn btn-primary" onclick="exportToPDF()">导出PDF</button>
+                    </div>
+                </div>
+                
+                <div class="dashboard-summary">
+                    <div class="summary-card">
+                        <div class="summary-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            👥
+                        </div>
+                        <div class="summary-info">
+                            <div class="summary-value" id="totalEmployees">0</div>
+                            <div class="summary-label">员工总数</div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            📊
+                        </div>
+                        <div class="summary-info">
+                            <div class="summary-value" id="totalRecords">0</div>
+                            <div class="summary-label">考核记录</div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            ⭐
+                        </div>
+                        <div class="summary-info">
+                            <div class="summary-value" id="avgScore">0</div>
+                            <div class="summary-label">平均得分</div>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            🏆
+                        </div>
+                        <div class="summary-info">
+                            <div class="summary-value" id="excellentRate">0%</div>
+                            <div class="summary-label">优秀率</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>绩效等级分布</h3>
+                        <canvas id="dashboardGradeChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>月度绩效趋势</h3>
+                        <canvas id="dashboardTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>部门绩效排名</h3>
+                        <div id="deptRankingContainer" class="ranking-list">
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>员工绩效TOP5</h3>
+                        <div id="employeeRankingContainer" class="ranking-list">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>最新考核记录</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>员工姓名</th>
+                                    <th>部门</th>
+                                    <th>考核周期</th>
+                                    <th>得分</th>
+                                    <th>等级</th>
+                                </tr>
+                            </thead>
+                            <tbody id="latestRecordsTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="employees" class="tab-content">
+                <div class="section-header">
+                    <h2>员工信息管理</h2>
+                    <button class="btn btn-primary" onclick="openEmployeeModal()">添加员工</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>员工编号</th>
+                                <th>姓名</th>
+                                <th>部门</th>
+                                <th>职位</th>
+                                <th>入职日期</th>
+                                <th>邮箱</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="kpi" class="tab-content">
+                <div class="section-header">
+                    <h2>KPI指标配置</h2>
+                    <button class="btn btn-primary" onclick="openKPIModal()">添加KPI指标</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>指标编码</th>
+                                <th>指标名称</th>
+                                <th>分类</th>
+                                <th>权重</th>
+                                <th>目标值</th>
+                                <th>单位</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kpiTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="performance" class="tab-content">
+                <div class="section-header">
+                    <h2>绩效考核录入</h2>
+                    <button class="btn btn-primary" onclick="openPerformanceModal()">录入考核</button>
+                </div>
+                <div class="filter-bar">
+                    <div class="form-group">
+                        <label>年份</label>
+                        <select id="perfYearFilter" onchange="loadPerformance()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>月份</label>
+                        <select id="perfMonthFilter" onchange="loadPerformance()">
+                            <option value="">全部</option>
+                            <option value="1">1月</option>
+                            <option value="2">2月</option>
+                            <option value="3">3月</option>
+                            <option value="4">4月</option>
+                            <option value="5">5月</option>
+                            <option value="6">6月</option>
+                            <option value="7">7月</option>
+                            <option value="8">8月</option>
+                            <option value="9">9月</option>
+                            <option value="10">10月</option>
+                            <option value="11">11月</option>
+                            <option value="12">12月</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>部门</label>
+                        <select id="perfDeptFilter" onchange="loadPerformance()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>员工编号</th>
+                                <th>员工姓名</th>
+                                <th>部门</th>
+                                <th>考核周期</th>
+                                <th>综合得分</th>
+                                <th>等级</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="performanceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="statistics" class="tab-content">
+                <div class="section-header">
+                    <h2>绩效统计分析</h2>
+                </div>
+                <div class="filter-bar">
+                    <div class="form-group">
+                        <label>年份</label>
+                        <select id="statYearFilter" onchange="loadStatistics()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>部门</label>
+                        <select id="statDeptFilter" onchange="loadStatistics()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRecords">0</div>
+                        <div class="stat-label">考核记录数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgScore">0</div>
+                        <div class="stat-label">平均得分</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="excellentCount">0</div>
+                        <div class="stat-label">优秀(≥90)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="goodCount">0</div>
+                        <div class="stat-label">良好(80-89)</div>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>分数分布</h3>
+                        <canvas id="scoreDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>月度趋势</h3>
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>部门对比</h3>
+                        <canvas id="deptChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>员工排名TOP10</h3>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>排名</th>
+                                        <th>员工</th>
+                                        <th>部门</th>
+                                        <th>平均分</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rankingTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-header" style="margin-top: 30px;">
+                    <h2>部门对比分析</h2>
+                </div>
+                <div class="filter-bar">
+                    <div class="form-group">
+                        <label>年份</label>
+                        <select id="deptCompYearFilter" onchange="loadDepartmentComparison()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>部门平均分排名</h3>
+                        <canvas id="deptAvgScoreChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>各等级分布对比</h3>
+                        <canvas id="deptGradeChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>部门详细对比</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>部门</th>
+                                    <th>人数</th>
+                                    <th>平均分</th>
+                                    <th>最高分</th>
+                                    <th>最低分</th>
+                                    <th>标准差</th>
+                                    <th>优秀率</th>
+                                    <th>良好率</th>
+                                    <th>合格率</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deptComparisonTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section-header" style="margin-top: 30px;">
+                    <h2>绩效趋势预测</h2>
+                </div>
+                <div class="filter-bar">
+                    <div class="form-group">
+                        <label>部门</label>
+                        <select id="predDeptFilter" onchange="loadPrediction()">
+                            <option value="">全部</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>预测月份</label>
+                        <select id="predMonthsFilter" onchange="loadPrediction()">
+                            <option value="3">3个月</option>
+                            <option value="6">6个月</option>
+                            <option value="12">12个月</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="stats-cards" id="predictionStats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="trendStatus">-</div>
+                        <div class="stat-label">趋势状态</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="dataPoints">0</div>
+                        <div class="stat-label">数据点数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="r2Value">0</div>
+                        <div class="stat-label">拟合度(R²)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="slopeValue">0</div>
+                        <div class="stat-label">趋势斜率</div>
+                    </div>
+                </div>
+                <div class="charts-container">
+                    <div class="chart-card" style="grid-column: span 2;">
+                        <h3>绩效趋势预测图</h3>
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>预测详情</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>预测月份</th>
+                                    <th>预测得分</th>
+                                    <th>预测等级</th>
+                                    <th>置信区间</th>
+                                    <th>置信度</th>
+                                </tr>
+                            </thead>
+                            <tbody id="predictionTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="employeeModalTitle">添加员工</h3>
+                <span class="close" onclick="closeEmployeeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm">
+                    <input type="hidden" id="employeeId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>员工编号 *</label>
+                            <input type="text" id="empEmployeeId" required>
+                        </div>
+                        <div class="form-group">
+                            <label>姓名 *</label>
+                            <input type="text" id="empName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>部门</label>
+                            <input type="text" id="empDepartment">
+                        </div>
+                        <div class="form-group">
+                            <label>职位</label>
+                            <input type="text" id="empPosition">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>入职日期</label>
+                            <input type="date" id="empHireDate">
+                        </div>
+                        <div class="form-group">
+                            <label>状态</label>
+                            <select id="empStatus">
+                                <option value="active">在职</option>
+                                <option value="inactive">离职</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>邮箱</label>
+                            <input type="email" id="empEmail">
+                        </div>
+                        <div class="form-group">
+                            <label>电话</label>
+                            <input type="tel" id="empPhone">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeEmployeeModal()">取消</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="kpiModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="kpiModalTitle">添加KPI指标</h3>
+                <span class="close" onclick="closeKPIModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="kpiForm">
+                    <input type="hidden" id="kpiId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>指标编码 *</label>
+                            <input type="text" id="kpiCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label>指标名称 *</label>
+                            <input type="text" id="kpiName" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>分类</label>
+                            <input type="text" id="kpiCategory" placeholder="如：业绩、行为、能力等">
+                        </div>
+                        <div class="form-group">
+                            <label>权重 *</label>
+                            <input type="number" id="kpiWeight" step="0.01" min="0" max="1" required placeholder="0-1之间">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>目标值</label>
+                            <input type="number" id="kpiTargetValue" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>单位</label>
+                            <input type="text" id="kpiUnit" placeholder="如：元、%、次等">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>描述</label>
+                        <textarea id="kpiDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="kpiStatus">
+                            <option value="active">启用</option>
+                            <option value="inactive">禁用</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeKPIModal()">取消</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="performanceModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="performanceModalTitle">录入绩效考核</h3>
+                <span class="close" onclick="closePerformanceModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="performanceForm">
+                    <input type="hidden" id="perfId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>员工 *</label>
+                            <select id="perfEmployee" required>
+                                <option value="">请选择员工</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>考核周期 *</label>
+                            <div class="form-row">
+                                <select id="perfYear" required style="flex: 1;">
+                                    <option value="">年</option>
+                                </select>
+                                <select id="perfMonth" required style="flex: 1; margin-left: 10px;">
+                                    <option value="">月</option>
+                                    <option value="1">1月</option>
+                                    <option value="2">2月</option>
+                                    <option value="3">3月</option>
+                                    <option value="4">4月</option>
+                                    <option value="5">5月</option>
+                                    <option value="6">6月</option>
+                                    <option value="7">7月</option>
+                                    <option value="8">8月</option>
+                                    <option value="9">9月</option>
+                                    <option value="10">10月</option>
+                                    <option value="11">11月</option>
+                                    <option value="12">12月</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>KPI评分</label>
+                        <div id="kpiScoresContainer" class="kpi-scores-container">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>综合得分</label>
+                            <input type="number" id="perfOverallScore" step="0.01" min="0" max="100" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>等级</label>
+                            <input type="text" id="perfGrade" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <textarea id="perfRemarks" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closePerformanceModal()">取消</button>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
