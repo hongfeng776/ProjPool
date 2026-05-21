@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+
+{% block title %}数据导入 - 鲜优达销售数据分析系统{% endblock %}
+{% block page_title %}数据导入{% endblock %}
+
+{% block content %}
+<div class="import-page">
+    <div class="import-card">
+        <div class="card-header">
+            <h3 class="card-title">📥 Excel销售数据导入</h3>
+            <p class="card-desc">支持 .xlsx 格式的Excel文件导入</p>
+        </div>
+        
+        <div class="card-body">
+            <div class="format-info">
+                <h4>Excel格式要求：</h4>
+                <div class="format-table">
+                    <table class="info-table">
+                        <thead>
+                            <tr>
+                                <th>列名</th>
+                                <th>说明</th>
+                                <th>示例</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>商品名称</td>
+                                <td>必填，需与系统中商品名称一致</td>
+                                <td>大白菜</td>
+                            </tr>
+                            <tr>
+                                <td>销售数量</td>
+                                <td>必填，数字</td>
+                                <td>10.5</td>
+                            </tr>
+                            <tr>
+                                <td>销售金额</td>
+                                <td>必填，数字（元）</td>
+                                <td>36.75</td>
+                            </tr>
+                            <tr>
+                                <td>销售日期</td>
+                                <td>必填，格式：YYYY-MM-DD</td>
+                                <td>2026-05-20</td>
+                            </tr>
+                            <tr>
+                                <td>客户类型</td>
+                                <td>可选，默认：散客</td>
+                                <td>会员/散客</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="upload-area" id="upload-area">
+                <input type="file" id="file-input" accept=".xlsx,.xls" hidden>
+                <div class="upload-content">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">点击或拖拽Excel文件到此处上传</p>
+                    <p class="upload-hint">仅支持 .xlsx 格式文件，最大 10MB</p>
+                </div>
+            </div>
+            
+            <div class="file-info" id="file-info" style="display: none;">
+                <div class="file-detail">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name" id="file-name">文件名</span>
+                    <span class="file-size" id="file-size">0KB</span>
+                </div>
+                <button class="btn-remove" id="btn-remove">×</button>
+            </div>
+            
+            <div class="import-actions">
+                <button class="btn btn-primary" id="btn-import" disabled>
+                    <span class="btn-icon">🚀</span>
+                    开始导入
+                </button>
+                <button class="btn btn-secondary" id="btn-download-tpl">
+                    <span class="btn-icon">📋</span>
+                    下载模板
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="result-card" id="result-card" style="display: none;">
+        <div class="card-header">
+            <h3 class="card-title">📊 导入结果</h3>
+        </div>
+        <div class="card-body">
+            <div class="result-stats">
+                <div class="result-item success">
+                    <div class="result-icon">✅</div>
+                    <div class="result-text">
+                        <span class="result-count" id="success-count">0</span>
+                        <span class="result-label">成功导入</span>
+                    </div>
+                </div>
+                <div class="result-item skipped">
+                    <div class="result-icon">⏭️</div>
+                    <div class="result-text">
+                        <span class="result-count" id="skipped-count">0</span>
+                        <span class="result-label">重复跳过</span>
+                    </div>
+                </div>
+                <div class="result-item failed">
+                    <div class="result-icon">❌</div>
+                    <div class="result-text">
+                        <span class="result-count" id="failed-count">0</span>
+                        <span class="result-label">导入失败</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="error-details" id="error-details" style="display: none;">
+                <h4>错误详情：</h4>
+                <div class="error-list" id="error-list"></div>
+            </div>
+            
+            <div class="result-actions">
+                <button class="btn btn-primary" onclick="location.reload()">
+                    继续导入
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(function() {
+    var selectedFile = null;
+    var $uploadArea = $('#upload-area');
+    var $fileInput = $('#file-input');
+    var $fileInfo = $('#file-info');
+    var $btnImport = $('#btn-import');
+    
+    $uploadArea.on('click', function() {
+        $fileInput.click();
+    });
+    
+    $uploadArea.on('dragover', function(e) {
+        e.preventDefault();
+        $uploadArea.addClass('dragover');
+    });
+    
+    $uploadArea.on('dragleave', function() {
+        $uploadArea.removeClass('dragover');
+    });
+    
+    $uploadArea.on('drop', function(e) {
+        e.preventDefault();
+        $uploadArea.removeClass('dragover');
+        var files = e.originalEvent.dataTransfer.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+    
+    $fileInput.on('change', function(e) {
+        if (e.target.files.length > 0) {
+            handleFile(e.target.files[0]);
+        }
+    });
+    
+    $('#btn-remove').on('click', function() {
+        selectedFile = null;
+        $fileInput.val('');
+        $uploadArea.show();
+        $fileInfo.hide();
+        $btnImport.prop('disabled', true);
+        $('#result-card').hide();
+    });
+    
+    function handleFile(file) {
+        var validExtensions = ['.xlsx', '.xls'];
+        var fileName = file.name.toLowerCase();
+        var isValid = validExtensions.some(function(ext) {
+            return fileName.endsWith(ext);
+        });
+        
+        if (!isValid) {
+            alert('请上传 .xlsx 或 .xls 格式的Excel文件');
+            return;
+        }
+        
+        if (file.size > 10 * 1024 * 1024) {
+            alert('文件大小不能超过 10MB');
+            return;
+        }
+        
+        selectedFile = file;
+        $('#file-name').text(file.name);
+        $('#file-size').text(formatFileSize(file.size));
+        $uploadArea.hide();
+        $fileInfo.show();
+        $btnImport.prop('disabled', false);
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + 'B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
+    }
+    
+    $btnImport.on('click', function() {
+        if (!selectedFile) return;
+        
+        var formData = new FormData();
+        formData.append('file', selectedFile);
+        
+        $btnImport.prop('disabled', true).html('<span class="loading"></span> 导入中...');
+        
+        $.ajax({
+            url: '/api/import/sales',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    showResult(response.data);
+                } else {
+                    alert('导入失败：' + (response.message || '未知错误'));
+                }
+            },
+            error: function(xhr) {
+                var msg = '导入失败';
+                try {
+                    var resp = JSON.parse(xhr.responseText);
+                    msg = resp.message || msg;
+                } catch(e) {}
+                alert(msg);
+            },
+            complete: function() {
+                $btnImport.prop('disabled', false).html('<span class="btn-icon">🚀</span> 开始导入');
+            }
+        });
+    });
+    
+    function showResult(data) {
+        $('#success-count').text(data.success_count);
+        $('#skipped-count').text(data.skipped_count);
+        $('#failed-count').text(data.failed_count);
+        
+        if (data.errors && data.errors.length > 0) {
+            var errorHtml = '';
+            data.errors.forEach(function(err, index) {
+                errorHtml += '<div class="error-item">' +
+                    '<span class="error-row">第' + err.row + '行</span>' +
+                    '<span class="error-msg">' + err.message + '</span>' +
+                    '</div>';
+            });
+            $('#error-list').html(errorHtml);
+            $('#error-details').show();
+        } else {
+            $('#error-details').hide();
+        }
+        
+        $('#result-card').show();
+    }
+    
+    $('#btn-download-tpl').on('click', function() {
+        window.location.href = '/api/import/template';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+SQLite 配置说明
+================
+
+Unity 中使用 SQLite 需要以下 DLL 文件，请放置在本目录 (Assets/Plugins/) 下：
+
+必需文件：
+1. Mono.Data.Sqlite.dll
+   - 位置：Unity 安装目录下的 Editor/Data/Mono/lib/mono/2.0/Mono.Data.Sqlite.dll
+   - 或从 Mono 官方下载对应版本
+
+2. sqlite3.dll (Windows) / libsqlite3.so (Linux) / libsqlite3.dylib (macOS)
+   - SQLite 原生库
+   - 可从 https://www.sqlite.org/download.html 下载
+
+导入步骤：
+1. 将上述 DLL 文件复制到 Assets/Plugins/ 目录
+2. 在 Unity 中选中 DLL，在 Inspector 中设置：
+   - 对于 Mono.Data.Sqlite.dll：
+     * Platforms: 勾选目标平台
+     * API Compatibility Level: 选择 .NET Framework
+3. 确保 Project Settings > Player > Other Settings > Configuration > API Compatibility Level
+   设置为 .NET Framework
+
+注意事项：
+- Android 平台需要额外配置，可能需要将 sqlite3.so 放在 Plugins/Android/ 目录
+- iOS 平台需要静态链接 SQLite
+- WebGL 平台不支持 SQLite 本地数据库，请使用 PlayerPrefs 或云端存储
+
+本项目已在 Packages/manifest.json 中添加了 com.unity.nuget.sqlite-core 包，
+如需使用该包的实现，请修改 DatabaseManager.cs 中的 using 语句。

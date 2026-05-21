@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}数据看板 - 鲜优达销售数据分析系统{% endblock %}
+{% block page_title %}数据看板{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                💰
+            </div>
+            <div class="stat-info">
+                <h3 class="stat-value" id="total-sales">¥0.00</h3>
+                <p class="stat-label">总销售额</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                📋
+            </div>
+            <div class="stat-info">
+                <h3 class="stat-value" id="total-orders">0</h3>
+                <p class="stat-label">订单总数</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                🏷️
+            </div>
+            <div class="stat-info">
+                <h3 class="stat-value" id="total-products">0</h3>
+                <p class="stat-label">商品种类</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                📦
+            </div>
+            <div class="stat-info">
+                <h3 class="stat-value" id="total-stock">0</h3>
+                <p class="stat-label">库存总量</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">销售趋势</h3>
+                <span class="chart-subtitle">近7天销售额变化</span>
+            </div>
+            <div class="chart-body">
+                <div id="sales-trend-chart" class="chart-container"></div>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">类别销售占比</h3>
+                <span class="chart-subtitle">按商品类别统计</span>
+            </div>
+            <div class="chart-body">
+                <div id="category-pie-chart" class="chart-container"></div>
+            </div>
+        </div>
+        
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <h3 class="chart-title">商品销量排行</h3>
+                <span class="chart-subtitle">销量TOP10商品</span>
+            </div>
+            <div class="chart-body">
+                <div id="product-rank-chart" class="chart-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

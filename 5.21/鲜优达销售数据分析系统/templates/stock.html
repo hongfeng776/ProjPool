@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}库存分析 - 鲜优达销售数据分析系统{% endblock %}
+{% block page_title %}库存分析{% endblock %}
+
+{% block content %}
+<div class="page-placeholder">
+    <div class="placeholder-icon">📦</div>
+    <h2>库存分析模块</h2>
+    <p>该模块将包含：库存总量统计、库存预警、进货分析、库存周转率分析等功能</p>
+    <div class="chart-container demo-chart" id="stock-demo-chart"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(function() {
+    var chart = echarts.init(document.getElementById('stock-demo-chart'));
+    var option = {
+        title: { text: '库存分析示例图表', left: 'center' },
+        tooltip: { trigger: 'item' },
+        legend: { orient: 'vertical', left: 'left' },
+        series: [{
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+            label: { show: false, position: 'center' },
+            emphasis: { label: { show: true, fontSize: 24, fontWeight: 'bold' } },
+            labelLine: { show: false },
+            data: [
+                { value: 1048, name: '蔬菜' },
+                { value: 735, name: '水果' },
+                { value: 580, name: '肉类' },
+                { value: 484, name: '水产' },
+                { value: 300, name: '蛋奶' }
+            ]
+        }]
+    };
+    chart.setOption(option);
+    $(window).resize(function() { chart.resize(); });
+});
+</script>
+{% endblock %}

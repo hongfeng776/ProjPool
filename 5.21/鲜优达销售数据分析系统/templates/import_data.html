@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}数据导入 - 鲜优达销售数据分析系统{% endblock %}
+{% block page_title %}数据导入{% endblock %}
+
+{% block content %}
+<div class="import-page">
+    <div class="upload-section">
+        <div class="upload-card">
+            <h3 class="section-title">📥 导入销售数据</h3>
+            <p class="section-desc">支持 Excel 格式文件 (.xlsx, .xls)，请确保数据格式正确</p>
+            
+            <div class="upload-area" id="upload-area">
+                <div class="upload-icon">📁</div>
+                <p class="upload-text">点击或拖拽 Excel 文件到此处上传</p>
+                <p class="upload-hint">支持 .xlsx, .xls 格式</p>
+                <input type="file" id="file-input" accept=".xlsx,.xls" hidden>
+            </div>
+            
+            <div class="file-info" id="file-info" style="display: none;">
+                <div class="file-details">
+                    <span class="file-icon">📄</span>
+                    <span class="file-name" id="file-name"></span>
+                    <span class="file-size" id="file-size"></span>
+                    <button class="remove-file" id="remove-file">×</button>
+                </div>
+            </div>
+            
+            <div class="upload-actions">
+                <button class="btn btn-primary" id="upload-btn" disabled>
+                    <span class="btn-icon">🚀</span>
+                    <span>开始导入</span>
+                </button>
+                <button class="btn btn-secondary" id="download-template">
+                    <span class="btn-icon">📋</span>
+                    <span>下载模板</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="template-card">
+            <h3 class="section-title">📋 Excel 格式说明</h3>
+            <div class="format-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>列名</th>
+                            <th>说明</th>
+                            <th>示例</th>
+                            <th>必填</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>商品名称</td>
+                            <td>商品的中文名称</td>
+                            <td>大白菜</td>
+                            <td><span class="required">是</span></td>
+                        </tr>
+                        <tr>
+                            <td>销售数量</td>
+                            <td>销售的数量（数字）</td>
+                            <td>10.5</td>
+                            <td><span class="required">是</span></td>
+                        </tr>
+                        <tr>
+                            <td>销售金额</td>
+                            <td>销售总金额（数字）</td>
+                            <td>36.75</td>
+                            <td><span class="required">是</span></td>
+                        </tr>
+                        <tr>
+                            <td>销售日期</td>
+                            <td>格式：YYYY-MM-DD</td>
+                            <td>2026-05-21</td>
+                            <td><span class="required">是</span></td>
+                        </tr>
+                        <tr>
+                            <td>客户类型</td>
+                            <td>散客/会员</td>
+                            <td>会员</td>
+                            <td><span class="optional">否</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="result-section" id="result-section" style="display: none;">
+        <div class="result-card">
+            <div class="result-header">
+                <h3 class="section-title">📊 导入结果</h3>
+                <div class="result-stats" id="result-stats"></div>
+            </div>
+            
+            <div class="result-summary" id="result-summary"></div>
+            
+            <div class="result-details" id="result-details">
+                <h4>详细记录</h4>
+                <div class="table-container">
+                    <table class="data-table" id="result-table">
+                        <thead>
+                            <tr>
+                                <th>行号</th>
+                                <th>商品名称</th>
+                                <th>销售数量</th>
+                                <th>销售金额</th>
+                                <th>销售日期</th>
+                                <th>状态</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">正在处理数据，请稍候...</p>
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <span class="progress-text" id="progress-text">0%</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/import.js') }}"></script>
+{% endblock %}

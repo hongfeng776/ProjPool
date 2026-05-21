@@ -1,0 +1,17 @@
+{
+    "name": "OfficeFishing.Network",
+    "references": [
+        "OfficeFishing.Core",
+        "Photon.Pun",
+        "Photon.Realtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

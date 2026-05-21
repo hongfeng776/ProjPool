@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}测试页面 - 鲜优达销售数据分析系统{% endblock %}
+{% block page_title %}分类销售测试{% endblock %}
+
+{% block content %}
+<div class="test-page">
+    <div class="test-card">
+        <h3 class="section-title">🧪 分类销售占比测试</h3>
+        <p class="section-desc">测试饼图是否能正确显示多个分类的数据</p>
+        
+        <div class="test-controls">
+            <button class="btn btn-primary" id="test-mock-btn">使用模拟数据</button>
+            <button class="btn btn-secondary" id="test-real-btn">使用真实数据</button>
+        </div>
+        
+        <div class="test-info">
+            <h4>API返回数据：</h4>
+            <pre id="api-response" class="code-block">点击按钮获取数据...</pre>
+        </div>
+        
+        <div class="chart-container" id="test-pie-chart" style="height: 400px;"></div>
+        
+        <div class="test-result">
+            <h4>测试结果：</h4>
+            <div id="test-result-text" class="result-text">等待测试...</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(function() {
+    var testChart = echarts.init(document.getElementById('test-pie-chart'));
+    var $apiResponse = $('#api-response');
+    var $testResult = $('#test-result-text');
+    
+    function renderPieChart(data, title) {
+        console.log('渲染测试饼图:', data);
+        
+        var colors = ['#667eea', '#f093fb', '#4facfe', '#43e97b', '#fa709a', '#ffd54f', '#ffa726'];
+        
+        var chartData = [];
+        var legendData = [];
+        var dataMap = {};
+        
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i];
+            chartData.push({
+                name: String(item.name),
+                value: Number(item.value),
+                itemStyle: {
+                    color: colors[i % colors.length]
+                }
+            });
+            legendData.push(String(item.name));
+            dataMap[String(item.name)] = Number(item.value);
+        }
+        
+        var option = {
+            title: {
+                text: title,
+                left: 'center',
+                top: 10
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}: ¥{c} ({d}%)'
+            },
+            legend: {
+                type: 'scroll',
+                orient: 'vertical',
+                right: 10,
+                top: 'middle',
+                data: legendData,
+                formatter: function(name) {
+                    var value = dataMap[name];
+                    if (value !== undefined) {
+                        return name + '  ¥' + value.toFixed(0);
+                    }
+                    return name;
+                }
+            },
+            color: colors,
+            series: [{
+                name: '销售分类',
+                type: 'pie',
+                radius: ['40%', '65%'],
+                center: ['38%', '55%'],
+                data: chartData,
+                itemStyle: {
+                    borderRadius: 6,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: false
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: 18,
+                        fontWeight: 'bold',
+                        formatter: '{b}\n¥{c}'
+                    }
+                }
+            }]
+        };
+        
+        testChart.clear();
+        testChart.setOption(option);
+        
+        $testResult.html(
+            '<span class="success">✓</span> 图表渲染成功，显示了 <strong>' + data.length + '</strong> 个分类：' +
+            '<ul>' + data.map(function(d) { return '<li>' + d.name + ': ¥' + d.value + '</li>'; }).join('') + '</ul>'
+        );
+    }
+    
+    $('#test-mock-btn').on('click', function() {
+        var mockData = [
+            { name: '蔬菜', value: 3500 },
+            { name: '水果', value: 2800 },
+            { name: '肉类', value: 4200 },
+            { name: '水产', value: 1500 },
+            { name: '蛋奶', value: 1800 }
+        ];
+        
+        $apiResponse.text(JSON.stringify(mockData, null, 2));
+        renderPieChart(mockData, '模拟数据测试');
+    });
+    
+    $('#test-real-btn').on('click', function() {
+        $.ajax({
+            url: '/api/sales/category',
+            type: 'GET',
+            success: function(response) {
+                $apiResponse.text(JSON.stringify(response, null, 2));
+                
+                if (response.success && response.data && response.data.length > 0) {
+                    renderPieChart(response.data, '真实数据');
+                } else {
+                    $testResult.html('<span class="error">✗</span> API返回失败或无数据：' + (response.message || '未知错误'));
+                }
+            },
+            error: function(xhr) {
+                $apiResponse.text('请求失败: ' + xhr.statusText);
+                $testResult.html('<span class="error">✗</span> API请求失败');
+            }
+        });
+    });
+    
+    $(window).resize(function() { testChart.resize(); });
+});
+</script>
+<style>
+.test-page { padding: 20px; }
+.test-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.test-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+.test-info {
+    margin-bottom: 20px;
+}
+.code-block {
+    background: #f5f7fa;
+    padding: 16px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 13px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.test-result {
+    margin-top: 20px;
+}
+.result-text {
+    padding: 16px;
+    background: #f0f9ff;
+    border-radius: 8px;
+    line-height: 1.8;
+}
+.result-text .success { color: #4caf50; font-weight: bold; }
+.result-text .error { color: #f44336; font-weight: bold; }
+.result-text ul {
+    margin: 10px 0 0 20px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,17 @@
+{
+  "name": "zhuangjiabao-interior-design",
+  "version": "1.0.0",
+  "description": "装家宝室内装修预览系统",
+  "scripts": {
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "keywords": ["three.js", "react", "node.js", "postgresql", "webgl"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

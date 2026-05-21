@@ -1,0 +1,100 @@
+主菜单场景搭建说明
+==================
+
+场景名称：MainMenu
+文件路径：Assets/Scenes/MainMenu.unity
+
+场景结构：
+-----------
+
+MainMenuScene (根节点)
+│
+├── GameInitializer (空物体)
+│   └── GameInitializer.cs 脚本
+│
+├── EventSystem (Unity 自带 UI 事件系统)
+│
+├── Main Camera
+│   └── 背景相机（可选，用于渲染背景）
+│
+└── Canvas (Screen Space - Overlay)
+    │   └── Canvas Scaler: Scale With Screen Size (1920x1080)
+    │
+    ├── Background (Image)
+    │   └── 背景图片，铺满整个画布
+    │
+    ├── TitleText (TextMeshPro - Text)
+    │   ├── Text: 办公室摸鱼大战
+    │   ├── Font Size: 80
+    │   └── Alignment: 居中
+    │
+    ├── UIManager (空物体)
+    │   └── UIManager.cs 脚本
+    │
+    ├── MainMenuPanel (Image - 面板)
+    │   ├── MainMenuController.cs 脚本
+    │   │
+    │   ├── StartGameButton (Button)
+    │   │   ├── Text: 开始游戏
+    │   │   └── 关联到 MainMenuController.startGameButton
+    │   │
+    │   ├── LeaderboardButton (Button)
+    │   │   ├── Text: 排行榜
+    │   │   └── 关联到 MainMenuController.leaderboardButton
+    │   │
+    │   ├── SettingsButton (Button)
+    │   │   ├── Text: 设置
+    │   │   └── 关联到 MainMenuController.settingsButton
+    │   │
+    │   └── QuitButton (Button)
+    │       ├── Text: 退出游戏
+    │       └── 关联到 MainMenuController.quitButton
+    │
+    ├── LeaderboardPanel (Image - 面板，默认隐藏)
+    │   ├── LeaderboardController.cs 脚本
+    │   ├── BackButton (Button - 返回)
+    │   ├── RefreshButton (Button - 刷新)
+    │   ├── GameModeDropdown (TMP_Dropdown - 游戏模式筛选)
+    │   ├── ScrollRect (滚动视图)
+    │   │   ├── Viewport
+    │   │   │   └── Content (Vertical Layout Group)
+    │   │   │       └── 关联到 LeaderboardController.leaderboardContainer
+    │   │   └── Scrollbar
+    │   └── Headers (排名 / 玩家 / 分数 / 日期)
+    │
+    ├── SettingsPanel (Image - 面板，默认隐藏)
+    │   ├── SettingsController.cs 脚本
+    │   ├── BackButton (Button - 返回)
+    │   ├── SaveButton (Button - 保存)
+    │   ├── MusicVolumeSlider (Slider - 音乐音量 0~1)
+    │   ├── SFXVolumeSlider (Slider - 音效音量 0~1)
+    │   ├── QualityDropdown (TMP_Dropdown - 画质选择)
+    │   ├── FullscreenToggle (Toggle - 全屏开关)
+    │   └── PlayerNameInput (TMP_InputField - 玩家名称)
+    │
+    └── LoadingPanel (Image - 面板，默认隐藏)
+        └── LoadingText / LoadingSpinner
+
+UI 关联设置：
+--------------
+在 UIManager 组件上关联：
+- MainMenuPanel -> MainMenuPanel 对象
+- LeaderboardPanel -> LeaderboardPanel 对象
+- SettingsPanel -> SettingsPanel 对象
+- LoadingPanel -> LoadingPanel 对象
+
+在 MainMenuController 组件上关联：
+- uiManager -> UIManager 对象
+- 各 Button 对应到场景中的按钮
+
+预制体：
+---------
+排行榜条目预制体：Assets/Prefabs/UI/LeaderboardEntry.prefab
+结构：
+LeaderboardEntry (Image)
+├── RankText (TMP_Text - 排名)
+├── PlayerNameText (TMP_Text - 玩家名)
+├── ScoreText (TMP_Text - 分数)
+└── DateText (TMP_Text - 日期)
+
+注意：所有 TMP 组件需要 Unity TextMeshPro 包，项目已配置。

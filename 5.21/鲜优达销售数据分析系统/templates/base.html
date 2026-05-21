@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}鲜优达销售数据分析系统{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🥬</span>
+                    <span class="logo-text">鲜优达</span>
+                </div>
+                <p class="logo-subtitle">销售数据分析系统</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item {% if active_page == 'index' %}active{% endif %}">
+                        <a href="{{ url_for('main.index') }}">
+                            <span class="nav-icon">📊</span>
+                            <span class="nav-text">数据看板</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if active_page == 'sales' %}active{% endif %}">
+                        <a href="{{ url_for('main.sales') }}">
+                            <span class="nav-icon">💰</span>
+                            <span class="nav-text">销售分析</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if active_page == 'sales_overview' %}active{% endif %}">
+                        <a href="{{ url_for('main.sales_overview') }}">
+                            <span class="nav-icon">📈</span>
+                            <span class="nav-text">销售总览</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if active_page == 'stock' %}active{% endif %}">
+                        <a href="{{ url_for('main.stock') }}">
+                            <span class="nav-icon">📦</span>
+                            <span class="nav-text">库存分析</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if active_page == 'products' %}active{% endif %}">
+                        <a href="{{ url_for('main.products') }}">
+                            <span class="nav-icon">🏷️</span>
+                            <span class="nav-text">商品管理</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if active_page == 'import' %}active{% endif %}">
+                        <a href="{{ url_for('main.import_data') }}">
+                            <span class="nav-icon">📥</span>
+                            <span class="nav-text">数据导入</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="db-status" id="db-status">
+                    <span class="status-dot" id="status-dot"></span>
+                    <span class="status-text" id="status-text">检测中...</span>
+                </div>
+            </div>
+        </aside>
+        
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="page-title">{% block page_title %}数据看板{% endblock %}</h1>
+                </div>
+                <div class="header-right">
+                    <span class="current-date" id="current-date"></span>
+                    <div class="user-info">
+                        <span class="user-avatar">👤</span>
+                        <span class="user-name" id="current-user-name">{% if current_user.is_authenticated %}{{ current_user.real_name or current_user.username }}{% else %}未登录{% endif %}</span>
+                        {% if current_user.is_authenticated %}
+                        <div class="user-dropdown">
+                            <button class="dropdown-btn">▼</button>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-item" onclick="window.location.href='/profile'">
+                                    <span>👤</span> 个人中心
+                                </div>
+                                <div class="dropdown-item" onclick="logout()">
+                                    <span>🚪</span> 退出登录
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </header>
+            
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

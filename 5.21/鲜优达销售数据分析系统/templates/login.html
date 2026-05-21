@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 鲜优达销售数据分析系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px 36px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo {
+            font-size: 56px;
+            margin-bottom: 12px;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 6px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .password-group {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 16px;
+            background: none;
+            border: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            border: 1px solid #ef9a9a;
+            color: #c62828;
+        }
+
+        .alert-info {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            color: #1565c0;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #eee;
+        }
+
+        .divider span {
+            padding: 0 12px;
+        }
+
+        .default-account {
+            background: #f5f7fa;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .default-account strong {
+            color: #1a237e;
+        }
+
+        .btn-loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">🥬</div>
+                <h1 class="login-title">鲜优达</h1>
+                <p class="login-subtitle">销售数据分析系统</p>
+            </div>
+
+            <div class="alert alert-error" id="error-alert"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="username">用户名</label>
+                    <input type="text" class="form-input" id="username" name="username" 
+                           placeholder="请输入用户名" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">密码</label>
+                    <div class="password-group">
+                        <input type="password" class="form-input" id="password" name="password" 
+                               placeholder="请输入密码" autocomplete="current-password" required>
+                        <button type="button" class="toggle-password" id="toggle-password">👁️</button>
+                    </div>
+                </div>
+
+                <div class="remember-forgot">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <span>记住我</span>
+                    </label>
+                    <a href="#" class="forgot-password">忘记密码？</a>
+                </div>
+
+                <button type="submit" class="login-btn" id="login-btn">
+                    <span>登 录</span>
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>默认账户</span>
+            </div>
+
+            <div class="default-account">
+                <strong>管理员账户：</strong>admin / admin123<br>
+                首次登录后请及时修改默认密码
+            </div>
+        </div>
+
+        <div class="login-footer">
+            © 2024 鲜优达销售数据分析系统 | 安全登录
+        </div>
+    </div>
+
+    <script>
+        $(function() {
+            $('#toggle-password').on('click', function() {
+                var $pwd = $('#password');
+                var $icon = $(this);
+                if ($pwd.attr('type') === 'password') {
+                    $pwd.attr('type', 'text');
+                    $icon.text('🙈');
+                } else {
+                    $pwd.attr('type', 'password');
+                    $icon.text('👁️');
+                }
+            });
+
+            $('#login-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                var username = $('#username').val().trim();
+                var password = $('#password').val();
+                var remember = $('#remember').is(':checked');
+
+                if (!username || !password) {
+                    showError('请输入用户名和密码');
+                    return;
+                }
+
+                var $btn = $('#login-btn');
+                $btn.prop('disabled', true);
+                $btn.html('<span class="btn-loading"></span><span>登录中...</span>');
+
+                $.ajax({
+                    url: '/api/auth/login',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        username: username,
+                        password: password,
+                        remember: remember
+                    }),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#error-alert').hide();
+                            window.location.href = '/';
+                        } else {
+                            showError(response.message);
+                            $btn.prop('disabled', false);
+                            $btn.html('<span>登 录</span>');
+                        }
+                    },
+                    error: function(xhr) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            showError(response.message || '登录失败，请重试');
+                        } catch (e) {
+                            showError('网络错误，请稍后重试');
+                        }
+                        $btn.prop('disabled', false);
+                        $btn.html('<span>登 录</span>');
+                    }
+                });
+            });
+
+            function showError(message) {
+                var $alert = $('#error-alert');
+                $alert.text(message);
+                $alert.show();
+                
+                setTimeout(function() {
+                    $alert.fadeOut();
+                }, 3000);
+            }
+
+            $('#username').focus();
+        });
+    </script>
+</body>
+</html>

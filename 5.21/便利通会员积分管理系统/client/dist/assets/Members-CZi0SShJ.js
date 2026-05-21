@@ -1,0 +1,1 @@
+import{_ as a,h as c,d as o,c as s}from"./index-Bb7Nvk5m.js";const t={},r={class:"page-container"};function n(_,e){return c(),o("div",r,[...e[0]||(e[0]=[s("h2",null,"会员管理",-1),s("p",{class:"placeholder"},"会员列表页面（待实现）",-1)])])}const l=a(t,[["render",n],["__scopeId","data-v-70e261f2"]]);export{l as default};

@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}销售总览 - 鲜优达销售数据分析系统{% endblock %}
+{% block page_title %}销售总览{% endblock %}
+
+{% block content %}
+<div class="sales-overview">
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                💰
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">今日销售额</p>
+                <h3 class="stat-value" id="today-sales">¥0.00</h3>
+                <div class="stat-trend" id="sales-trend-tag">
+                    <span class="trend-icon">📈</span>
+                    <span class="trend-text">较昨日</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                📋
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">今日订单数</p>
+                <h3 class="stat-value" id="today-orders">0</h3>
+                <div class="stat-trend" id="orders-trend-tag">
+                    <span class="trend-icon">📈</span>
+                    <span class="trend-text">较昨日</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                📊
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">今日客单价</p>
+                <h3 class="stat-value" id="today-avg-price">¥0.00</h3>
+                <div class="stat-trend" id="avg-trend-tag">
+                    <span class="trend-icon">📈</span>
+                    <span class="trend-text">较昨日</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="charts-grid">
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <div>
+                    <h3 class="chart-title">销售额趋势</h3>
+                    <span class="chart-subtitle">最近7天销售额变化</span>
+                </div>
+                <div class="chart-actions">
+                    <button class="chart-btn active" data-days="7">7天</button>
+                    <button class="chart-btn" data-days="14">14天</button>
+                    <button class="chart-btn" data-days="30">30天</button>
+                </div>
+            </div>
+            <div class="chart-body">
+                <div id="sales-trend-chart" class="chart-container"></div>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">分类销售占比</h3>
+                <span class="chart-subtitle">按商品类别统计</span>
+            </div>
+            <div class="chart-body">
+                <div id="category-pie-chart" class="chart-container"></div>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">今日销售明细</h3>
+                <span class="chart-subtitle">最新交易记录</span>
+            </div>
+            <div class="chart-body">
+                <div class="table-container">
+                    <table class="data-table" id="today-sales-table">
+                        <thead>
+                            <tr>
+                                <th>商品名称</th>
+                                <th>数量</th>
+                                <th>金额</th>
+                                <th>客户类型</th>
+                            </tr>
+                        </thead>
+                        <tbody id="today-sales-tbody">
+                            <tr>
+                                <td colspan="4" class="loading-text">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/sales.js') }}"></script>
+{% endblock %}

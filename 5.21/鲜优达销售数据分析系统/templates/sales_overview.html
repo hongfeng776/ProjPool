@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}销售总览 - 鲜优达销售数据分析系统{% endblock %}
+{% block page_title %}销售总览{% endblock %}
+
+{% block content %}
+<div class="sales-overview">
+    <div class="overview-cards">
+        <div class="overview-card">
+            <div class="overview-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                💰
+            </div>
+            <div class="overview-info">
+                <p class="overview-label">今日销售额</p>
+                <h3 class="overview-value" id="today-sales">¥0.00</h3>
+                <p class="overview-change" id="today-sales-change">
+                    <span>较昨日</span>
+                    <span class="change-value">--</span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                📋
+            </div>
+            <div class="overview-info">
+                <p class="overview-label">今日订单数</p>
+                <h3 class="overview-value" id="today-orders">0</h3>
+                <p class="overview-change" id="today-orders-change">
+                    <span>较昨日</span>
+                    <span class="change-value">--</span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                💵
+            </div>
+            <div class="overview-info">
+                <p class="overview-label">今日客单价</p>
+                <h3 class="overview-value" id="today-avg-price">¥0.00</h3>
+                <p class="overview-change" id="today-avg-change">
+                    <span>较昨日</span>
+                    <span class="change-value">--</span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="overview-card">
+            <div class="overview-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                🏷️
+            </div>
+            <div class="overview-info">
+                <p class="overview-label">今日销售商品</p>
+                <h3 class="overview-value" id="today-products">0</h3>
+                <p class="overview-change" id="today-products-change">
+                    <span>种商品</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="overview-charts">
+        <div class="chart-card large">
+            <div class="chart-header">
+                <div class="chart-title-wrapper">
+                    <h3 class="chart-title">📈 最近7天销售额趋势</h3>
+                    <span class="chart-subtitle">每日销售额变化情况</span>
+                </div>
+                <div class="chart-actions">
+                    <div class="date-range-picker">
+                        <span class="range-label">时间范围：</span>
+                        <select id="trend-range" class="range-select">
+                            <option value="7">最近7天</option>
+                            <option value="14">最近14天</option>
+                            <option value="30">最近30天</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-body">
+                <div id="sales-trend-chart" class="chart-container large-chart"></div>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title-wrapper">
+                    <h3 class="chart-title">🥧 商品分类销售占比</h3>
+                    <span class="chart-subtitle">各类别销售额占比</span>
+                </div>
+            </div>
+            <div class="chart-body">
+                <div id="category-pie-chart" class="chart-container"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="overview-summary">
+        <div class="chart-card full-width">
+            <div class="chart-header">
+                <div class="chart-title-wrapper">
+                    <h3 class="chart-title">📊 今日销售明细</h3>
+                    <span class="chart-subtitle">按分类统计今日销售情况</span>
+                </div>
+            </div>
+            <div class="chart-body">
+                <div class="table-container">
+                    <table class="data-table" id="today-detail-table">
+                        <thead>
+                            <tr>
+                                <th>商品分类</th>
+                                <th>销售数量</th>
+                                <th>销售金额</th>
+                                <th>订单数</th>
+                                <th>占比</th>
+                            </tr>
+                        </thead>
+                        <tbody id="today-detail-tbody">
+                            <tr>
+                                <td colspan="5" class="loading-text">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/sales_overview.js') }}"></script>
+{% endblock %}

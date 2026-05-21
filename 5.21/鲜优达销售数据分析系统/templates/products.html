@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}商品管理 - 鲜优达销售数据分析系统{% endblock %}
+{% block page_title %}商品管理{% endblock %}
+
+{% block content %}
+<div class="page-placeholder">
+    <div class="placeholder-icon">🏷️</div>
+    <h2>商品管理模块</h2>
+    <p>该模块将包含：商品列表、商品添加/编辑/删除、类别管理、价格管理等功能</p>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>商品ID</th>
+                    <th>商品名称</th>
+                    <th>类别</th>
+                    <th>单价</th>
+                    <th>库存</th>
+                    <th>创建时间</th>
+                </tr>
+            </thead>
+            <tbody id="products-table-body">
+                <tr>
+                    <td colspan="6" class="loading-text">加载中...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(function() {
+    $.ajax({
+        url: '/api/products',
+        type: 'GET',
+        success: function(response) {
+            var html = '';
+            if (response.data && response.data.length > 0) {
+                response.data.forEach(function(item) {
+                    html += '<tr>' +
+                        '<td>' + item.id + '</td>' +
+                        '<td>' + item.name + '</td>' +
+                        '<td><span class="category-badge">' + item.category + '</span></td>' +
+                        '<td>¥' + item.price + '</td>' +
+                        '<td>' + item.stock + ' ' + item.unit + '</td>' +
+                        '<td>' + item.created_at + '</td>' +
+                        '</tr>';
+                });
+            } else {
+                html = '<tr><td colspan="6" class="empty-text">暂无数据</td></tr>';
+            }
+            $('#products-table-body').html(html);
+        },
+        error: function() {
+            $('#products-table-body').html('<tr><td colspan="6" class="error-text">加载失败，请检查数据库连接</td></tr>');
+        }
+    });
+});
+</script>
+{% endblock %}

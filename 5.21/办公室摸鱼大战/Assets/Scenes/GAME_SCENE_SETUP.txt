@@ -1,0 +1,707 @@
+办公室摸鱼大战 - 游戏场景搭建指南
+========================================
+
+场景名称：GameScene
+文件路径：Assets/Scenes/GameScene.unity
+
+一、场景层级结构
+=================
+
+GameScene
+│
+├── [GameManager] (空物体)
+│   ├── GameInitializer.cs (脚本)
+│   ├── GameManager.cs (脚本)
+│   ├── OfficeFishingGameManager.cs (脚本)
+│   ├── EventSystem.cs (脚本)
+│   ├── SceneLoader.cs (脚本)
+│   ├── AudioManager.cs (脚本)
+│   │
+│   ├── PlayerController 引用：关联到 Player 对象
+│   ├── BossController 引用：关联到 Boss 对象
+│   └── FishingManager 引用：关联到 FishingManager 子对象
+│
+├── [FishingManager] (空物体 - 作为 GameManager 子对象)
+│   └── FishingManager.cs (脚本)
+│
+│
+├── [Environment] (空物体 - 场景环境父对象)
+│   │
+│   ├── OfficeFloor (平面/地面)
+│   │   └── Layer: Default
+│   │
+│   ├── Walls (四面墙壁)
+│   │   └── Layer: Default
+│   │
+│   ├── Ceiling (天花板 - 可选)
+│   │
+│   ├── [Furniture] (空物体 - 家具父对象)
+│   │   ├── Desk (办公桌)
+│   │   ├── Chair (办公椅)
+│   │   ├── Cabinet (文件柜)
+│   │   ├── Bookshelf (书架)
+│   │   └── Sofa (沙发 - 可选)
+│   │
+│   └── [Lighting]
+│       ├── Directional Light (主光源)
+│       └── CeilingLights (多个点光源/聚光灯)
+│
+│
+├── [Player] (空物体或角色模型)
+│   ├── PlayerController.cs (脚本)
+│   │   ├── playerTransform: 自身 Transform
+│   │   ├── playerAnimator: Animator 组件(如有)
+│   │   ├── mainCamera: 关联到 Main Camera
+│   │   └── interactiveLayer: Interactive (层 8)
+│   │
+│   ├── Animator (如有角色模型)
+│   └── Collider (角色碰撞体)
+│
+│
+├── [Boss] (空物体或老板角色模型)
+│   ├── BossController.cs (脚本)
+│   │   ├── bossTransform: 自身 Transform
+│   │   ├── bossAnimator: Animator 组件(如有)
+│   │   ├── defaultDetectionRadius: 3
+│   │   ├── fieldOfView: 60
+│   │   ├── playerLayer: Player (层 9)
+│   │   ├── obstacleLayer: Default, Furniture
+│   │   ├── moveSpeed: 2
+│   │   └── patrolPoints: 按下面三添加
+│   │
+│   ├── Animator (如有角色模型)
+│   └── Collider (老板碰撞体)
+│
+│
+├── [PatrolPoints] (空物体)
+│   ├── PatrolPoint_01 (空物体)
+│   │   └── Position: (-5, 0, 0)
+│   │
+│   ├── PatrolPoint_02 (空物体)
+│   │   └── Position: (0, 0, 5)
+│   │
+│   ├── PatrolPoint_03 (空物体)
+│   │   └── Position: (5, 0, 0)
+│   │
+│   └── PatrolPoint_04 (空物体)
+│       └── Position: (0, 0, -5)
+│
+│   * 将这些点拖入 BossController 的 patrolPoints 列表
+│   * 每个点可以设置 waitTime(停留时间) 和 detectionRadius(检测半径)
+│
+│
+├── [InteractiveItems] (空物体)
+│   │
+│   ├── [Computer] (电脑模型)
+│   │   ├── InteractiveItem.cs (脚本)
+│   │   │   ├── itemId: computer_01
+│   │   │   ├── itemName: 电脑
+│   │   │   ├── type: Computer
+│   │   │   └── canInteract: true
+│   │   ├── Collider (勾选 Is Trigger)
+│   │   └── Layer: Interactive (层 8)
+│   │
+│   ├── [Phone] (手机模型)
+│   │   ├── InteractiveItem.cs (脚本)
+│   │   │   ├── itemId: phone_01
+│   │   │   ├── itemName: 玩手机
+│   │   │   ├── type: Phone
+│   │   │   ├── fishingAction:
+│   │   │   │   ├── duration: 2.5
+│   │   │   │   ├── baseScore: 15
+│   │   │   │   └── riskLevel: 0.7
+│   │   │   └── hoverText: 摸鱼：刷手机
+│   │   ├── Collider (勾选 Is Trigger)
+│   │   └── Layer: Interactive (层 8)
+│   │
+│   ├── [GameConsole] (游戏机/掌机模型)
+│   │   ├── InteractiveItem.cs (脚本)
+│   │   │   ├── itemId: console_01
+│   │   │   ├── itemName: 打游戏
+│   │   │   ├── type: GameConsole
+│   │   │   ├── fishingAction:
+│   │   │   │   ├── duration: 4.0
+│   │   │   │   ├── baseScore: 30
+│   │   │   │   └── riskLevel: 0.9
+│   │   │   └── hoverText: 摸鱼：玩游戏(高风险高回报)
+│   │   ├── Collider (勾选 Is Trigger)
+│   │   └── Layer: Interactive (层 8)
+│   │
+│   ├── [Comic] (漫画书模型)
+│   │   ├── InteractiveItem.cs (脚本)
+│   │   │   ├── itemId: comic_01
+│   │   │   ├── itemName: 看漫画
+│   │   │   ├── type: Comic
+│   │   │   ├── fishingAction:
+│   │   │   │   ├── duration: 3.0
+│   │   │   │   ├── baseScore: 20
+│   │   │   │   └── riskLevel: 0.5
+│   │   │   └── hoverText: 摸鱼：看漫画
+│   │   ├── Collider (勾选 Is Trigger)
+│   │   └── Layer: Interactive (层 8)
+│   │
+│   ├── [Snack] (零食模型)
+│   │   ├── InteractiveItem.cs (脚本)
+│   │   │   ├── itemId: snack_01
+│   │   │   ├── itemName: 吃零食
+│   │   │   ├── type: Snack
+│   │   │   ├── fishingAction:
+│   │   │   │   ├── duration: 2.0
+│   │   │   │   ├── baseScore: 10
+│   │   │   │   └── riskLevel: 0.3
+│   │   │   └── hoverText: 摸鱼：吃零食
+│   │   ├── Collider (勾选 Is Trigger)
+│   │   └── Layer: Interactive (层 8)
+│   │
+│   └── [Tea] (茶杯模型)
+│       ├── InteractiveItem.cs (脚本)
+│       │   ├── itemId: tea_01
+│       │   ├── itemName: 喝茶
+│       │   ├── type: Tea
+│       │   ├── fishingAction:
+│       │   │   ├── duration: 1.5
+│       │   │   ├── baseScore: 5
+│       │   │   └── riskLevel: 0.2
+│       │   └── hoverText: 摸鱼：喝茶水
+│       ├── Collider (勾选 Is Trigger)
+│       └── Layer: Interactive (层 8)
+│
+│
+├── Main Camera
+│   ├── Position: (0, 8, -8) 或适合俯视视角的位置
+│   ├── Rotation: (45, 0, 0) 等
+│   └── Projection: Perspective 或 Orthographic
+│
+│
+├── [UI] (Canvas)
+│   ├── Canvas Scaler: Scale With Screen Size (1920x1080)
+│   ├── UI Scale Mode: Scale With Screen Size
+│   │
+│   ├── GameHUDController.cs (脚本)
+│   │
+│   ├── [HealthPanel] (血量显示 - 左上角)
+│   │   ├── Heart_01 (Image)
+│   │   ├── Heart_02 (Image)
+│   │   ├── Heart_03 (Image)
+│   │   └── * 拖入 GameHUDController.healthHearts 数组
+│   │
+│   ├── [ScorePanel] (得分显示 - 右上角)
+│   │   ├── ScoreText (TMP_Text)
+│   │   └── (可选) ScoreAnimator (Animator)
+│   │
+│   ├── [TimePanel] (时间显示 - 顶部中央)
+│   │   ├── TimeText (TMP_Text)
+│   │   └── TimeWarningImage (Image - 时间不足警告)
+│   │
+│   ├── [FishingProgressPanel] (摸鱼进度 - 底部中央)
+│   │   ├── 默认隐藏: 勾选 Active = false
+│   │   ├── FishingActionText (TMP_Text - 摸鱼行为名称)
+│   │   ├── ProgressBG (Image - 进度条背景)
+│   │   ├── FishingProgressBar (Image - 进度条填充)
+│   │   │   └── Image Type: Filled
+│   │   │   └── Fill Method: Horizontal
+│   │   └── ComboText (TMP_Text - 连击显示)
+│   │
+│   ├── [BossWarningPanel] (老板检测警告 - 顶部)
+│   │   ├── 默认隐藏: 勾选 Active = false
+│   │   ├── WarningText (TMP_Text - "老板来了!")
+│   │   └── BossDetectionBar (Image - 检测进度条)
+│   │
+│   ├── [PauseButton] (暂停按钮 - 右上角)
+│   │   └── Button 组件
+│   │
+│   ├── [PausePanel] (暂停面板 - 全屏遮罩)
+│   │   ├── 默认隐藏: 勾选 Active = false
+│   │   ├── BG (Image - 半透明背景)
+│   │   ├── ResumeButton (Button - 继续游戏)
+│   │   └── QuitButton (Button - 返回主菜单)
+│   │
+│   └── [GameOverPanel] (游戏结束面板)
+│       ├── 默认隐藏: 勾选 Active = false
+│       ├── BG (Image - 半透明背景)
+│       ├── TitleText (TMP_Text - "游戏结束")
+│       ├── FinalScoreText (TMP_Text - 最终得分)
+│       ├── RestartButton (Button - 再来一局)
+│       └── MainMenuButton (Button - 返回主菜单)
+│
+└── EventSystem (Unity 自带)
+
+
+二、层级设置 (Layer Setup)
+===========================
+
+在 Unity 中点击 Layers → Edit Layers，添加以下层：
+
+- Layer 8: Interactive (可交互物品)
+- Layer 9: Player      (玩家)
+
+
+三、物理层设置 (Physics Layer Collision)
+=========================================
+
+Edit → Project Settings → Physics
+
+确保以下层之间的碰撞：
+- Player 与 Default (可以和环境碰撞)
+- Boss 与 Default (可以和环境碰撞)
+- Interactive 可以与 Raycast 交互 (不需要物理碰撞)
+
+可以关闭不需要的层碰撞以提高性能。
+
+
+四、动画控制器建议 (Animator)
+===============================
+
+如果使用角色动画，建议设置以下参数：
+
+Player Animator 参数：
+- int State (0=Working, 1=Fishing, 2=GettingCaught)
+- trigger Work
+- trigger Fish
+- trigger Caught
+
+Boss Animator 参数：
+- float Speed
+- trigger Angry
+
+
+五、游戏平衡数值参考
+=====================
+
+摸鱼物品配置参考：
+| 物品   | 持续时间 | 基础分 | 风险值 | 说明 |
+|--------|----------|--------|--------|------|
+| 手机   | 2.5秒    | 15分   | 0.7    | 中高风险 |
+| 游戏机 | 4.0秒    | 30分   | 0.9    | 高风险高回报 |
+| 漫画   | 3.0秒    | 20分   | 0.5    | 中等 |
+| 零食   | 2.0秒    | 10分   | 0.3    | 低风险 |
+| 茶水   | 1.5秒    | 5分    | 0.2    | 最安全 |
+
+游戏设置：
+- 初始血量: 3
+- 被抓伤害: 1
+- 被抓扣分: 10% 当前分
+- 连击加成: 每连击 +10% 分
+- 最大连击: 10
+- 游戏时长: 120秒
+- 老板检测时间: 0.5秒
+
+
+六、小游戏系统配置
+==================
+
+6.1 MiniGameManager 设置
+------------------------
+
+在 GameManager 对象下添加 [MiniGameManager] 子对象：
+├── [MiniGameManager] (空物体)
+│   └── MiniGameManager.cs (脚本)
+│       ├── miniGamePanel: 关联到 UI 中的小游戏面板
+│       ├── gameContainer: 小游戏容器对象
+│       ├── phoneGamePrefab: PhoneGame 预制体
+│       ├── cardGamePrefab: CardGame 预制体
+│       └── snackGamePrefab: SnackGame 预制体
+
+
+6.2 小游戏 UI 面板
+-------------------
+
+在 UI Canvas 下添加小游戏面板：
+
+├── [UI] (Canvas)
+│   │
+│   └── [MiniGamePanel] (全屏遮罩面板)
+│       ├── 默认隐藏: 勾选 Active = false
+│       ├── BG (Image - 半透明背景)
+│       │
+│       └── [GameContainer] (空物体 - 小游戏容器)
+│           └── 小游戏实例将在此生成
+
+
+6.3 小游戏预制体创建
+----------------------
+
+A) PhoneGame 预制体 (PhoneGame.prefab)
+   ├── PhoneGame (Panel)
+   │   ├── PhoneGame.cs (脚本)
+   │   │   ├── targetScore: 100
+   │   │   ├── spawnInterval: 0.8
+   │   │   ├── gameDuration: 15
+   │   │   ├── contentArea: 游戏区域 RectTransform
+   │   │   ├── targetPrefab: Target 预制体
+   │   │   ├── comboText: 连击显示
+   │   │   └── scoreDisplay: 分数显示
+   │   │
+   │   ├── BG (Image - 手机屏幕背景)
+   │   ├── ScoreText (TMP_Text - 分数)
+   │   └── ContentArea (RectTransform - 游戏区域)
+   │
+   └── Target 预制体 (PhoneTarget.prefab)
+       ├── Target (Button)
+       │   ├── Image (背景)
+       │   └── Text (TMP_Text - 内容名称)
+
+B) CardGame 预制体 (CardGame.prefab)
+   └── CardGame (Panel)
+       ├── CardGame.cs (脚本)
+       │   ├── gridRows: 3
+       │   ├── gridCols: 4
+       │   ├── gameDuration: 30
+       │   ├── cardGrid: GridLayoutGroup
+       │   ├── cardPrefab: Card 预制体
+       │   ├── matchCountText: 配对数显示
+       │   └── moveCountText: 移动次数显示
+       │
+       ├── BG (Image - 游戏背景)
+       ├── HeaderPanel
+       │   ├── MatchText (TMP_Text - "配对: 0/6")
+       │   └── MoveText (TMP_Text - "步数: 0")
+       └── Grid (GridLayoutGroup - 卡牌网格)
+
+   Card 预制体 (Card.prefab)
+   └── Card (Image)
+       └── CardHandler.cs (脚本)
+
+C) SnackGame 预制体 (SnackGame.prefab)
+   └── SnackGame (Panel)
+       ├── SnackGame.cs (脚本)
+       │   ├── targetSnacksEaten: 10
+       │   ├── snackSpawnInterval: 0.6
+       │   ├── gameDuration: 15
+       │   ├── bowlArea: 零食区域 RectTransform
+       │   ├── snackPrefab: Snack 预制体
+       │   ├── eatenCountText: 已吃数量显示
+       │   ├── scoreDisplay: 分数显示
+       │   ├── stomachFill: 饱腹度填充图
+       │   └── hungerSlider: 饥饿度滑块
+       │
+       ├── BG (Image - 游戏背景)
+       ├── StomachFill (Image - 饱腹进度)
+       ├── HungerSlider (Slider - 饥饿度)
+       ├── EatenCountText (TMP_Text - "已吃: 0/10")
+       └── BowlArea (RectTransform - 零食区域)
+
+   Snack 预制体 (Snack.prefab)
+   └── Snack (Button)
+       ├── Image (背景)
+       └── Text (TMP_Text - 零食名称)
+
+
+6.4 可交互物品配置
+--------------------
+
+每个可交互物品需要设置以下属性：
+
+Phone 物品 (InteractiveType = Phone):
+- enableMiniGame: true
+- miniGameType: "phone"
+- fishingAction.baseScore: 15
+- fishingAction.riskLevel: 0.7
+
+GameConsole 物品 (InteractiveType = GameConsole):
+- enableMiniGame: true
+- miniGameType: "card"
+- fishingAction.baseScore: 30
+- fishingAction.riskLevel: 0.9
+
+Snack 物品 (InteractiveType = Snack):
+- enableMiniGame: true
+- miniGameType: "snack"
+- fishingAction.baseScore: 10
+- fishingAction.riskLevel: 0.3
+
+Computer 物品 (InteractiveType = Computer):
+- enableMiniGame: false
+- miniGameType: ""
+
+
+6.5 小游戏完成后的分数计算
+----------------------------
+
+PhoneGame: 基础分 + 连击加成 + 风险系数
+- 成功点击加分，避开"工作邮件"扣分
+- 连击: 每连击 +2 分，最多 +20 分
+
+CardGame: 配对分 + 效率加成 + 时间加成
+- 每个配对: +25 分
+- 效率加成: (最少步数 - 实际步数) × 5
+- 时间加成: 剩余时间 × 2
+
+SnackGame: 零食分 + 饱腹加成 + 完成加成
+- 每个零食基础分
+- 饱腹加成: 饱腹度 × 20
+- 完成加成: 完成度 × 30
+
+
+七、排行榜配置
+================
+
+7.1 排行榜管理器
+------------------
+
+在 GameManager 对象下添加 [LeaderboardManager] 子对象：
+├── [LeaderboardManager] (空物体)
+│   └── LeaderboardManager.cs (脚本)
+
+排行榜支持以下功能：
+- 保存游戏分数到 SQLite 数据库
+- 查询最高分 (GetTopScores)
+- 查询玩家历史分数 (GetPlayerScores)
+- 查询玩家排名 (GetPlayerRank)
+- 清空排行榜 (ClearLeaderboard)
+
+7.2 排行榜数据存储
+--------------------
+
+数据库文件位置：
+- Editor: Assets/OfficeFishing.db
+- 平台: Application.persistentDataPath/OfficeFishing.db
+
+排行榜表结构：
+- Id: 唯一标识
+- PlayerId: 玩家 ID
+- PlayerName: 玩家名称
+- Score: 分数
+- GameMode: 游戏模式 (Default/Phone/Card/Snack)
+- PlayedAt: 游玩时间
+
+7.3 排行榜 UI 设置
+--------------------
+
+主菜单的排行榜面板：
+├── [LeaderboardPanel] (Image - 面板)
+│   ├── LeaderboardController.cs (脚本)
+│   │   ├── leaderboardEntryPrefab: 条目预制体
+│   │   ├── leaderboardContainer: 内容容器
+│   │   ├── displayCount: 10
+│   │   └── gameModeDropdown: 模式筛选下拉框
+│   │
+│   ├── BackButton (Button - 返回)
+│   ├── RefreshButton (Button - 刷新)
+│   ├── GameModeDropdown (TMP_Dropdown)
+│   │   ├── Option 0: "全部"
+│   │   ├── Option 1: "默认"
+│   │   ├── Option 2: "刷手机"
+│   │   ├── Option 3: "玩纸牌"
+│   │   └── Option 4: "吃零食"
+│   └── ScrollRect (滚动视图)
+│       └── Content (Vertical Layout Group)
+
+排行榜条目预制体 (LeaderboardEntry.prefab)：
+├── LeaderboardEntry (Image)
+│   ├── RankText (TMP_Text - 排名)
+│   ├── PlayerNameText (TMP_Text - 玩家名)
+│   ├── ScoreText (TMP_Text - 分数)
+│   └── DateText (TMP_Text - 日期)
+
+7.4 分数保存流程
+--------------------
+
+游戏结束时自动保存：
+1. OfficeFishingGameManager.EndGame() 调用 SaveScoreToDatabase()
+2. LeaderboardRepository.AddScore() 插入数据库
+3. LeaderboardController.RefreshLeaderboard() 刷新显示
+
+
+八、道具系统配置
+==================
+
+8.1 道具管理器设置
+------------------
+
+在 GameManager 对象下添加 [ItemManager] 子对象：
+├── [ItemManager] (空物体)
+│   └── ItemManager.cs (脚本)
+│       └── availableItems: 配置可用道具列表
+
+
+8.2 可用道具配置
+------------------
+
+在 ItemManager 的 availableItems 列表中添加以下道具：
+
+A) SlowBoss (老板变慢)
+   - itemId: "slow_boss"
+   - itemName: "老板变慢"
+   - type: SlowBoss
+   - duration: 8
+   - value: 0.5 (减速 50%)
+   - description: "老板巡逻速度降低 50%，持续 8 秒"
+
+B) Invisibility (隐身)
+   - itemId: "invisibility"
+   - itemName: "隐身"
+   - type: Invisibility
+   - duration: 5
+   - value: 1
+   - description: "玩家隐身 5 秒，老板无法检测到你"
+
+C) ScoreBoost (分数加成)
+   - itemId: "score_boost"
+   - itemName: "分数加成"
+   - type: ScoreBoost
+   - duration: 10
+   - value: 0.5 (加成 50%)
+   - description: "得分增加 50%，持续 10 秒"
+
+D) TimeExtend (时间延长)
+   - itemId: "time_extend"
+   - itemName: "时间延长"
+   - type: TimeExtend
+   - duration: 0
+   - value: 15 (延长 15 秒)
+   - description: "游戏时间延长 15 秒"
+
+E) Heal (治疗)
+   - itemId: "heal"
+   - itemName: "治疗"
+   - type: Heal
+   - duration: 0
+   - value: 1 (恢复 1 点血量)
+   - description: "恢复 1 点血量"
+
+
+8.3 道具使用 UI
+----------------
+
+在 UI Canvas 下添加道具面板：
+
+├── [ItemPanel] (Image - 面板)
+│   ├── ItemPanelController.cs (脚本)
+│   │   ├── itemSlots: 道具槽位数组
+│   │   └── itemManager: 关联到 ItemManager
+│   │
+│   └── [ItemSlots] (Horizontal Layout Group)
+│       ├── ItemSlot_01 (Button)
+│       ├── ItemSlot_02 (Button)
+│       ├── ItemSlot_03 (Button)
+│       └── ItemSlot_04 (Button)
+│           ├── Icon (Image - 道具图标)
+│           ├── CountText (TMP_Text - 数量)
+│           └── CooldownOverlay (Image - 冷却遮罩)
+
+
+8.4 道具触发方式
+------------------
+
+道具可以通过以下方式获取：
+- 完成小游戏时随机掉落
+- 达成连击奖励
+- 关卡进度奖励
+
+使用道具：
+- 点击道具槽位使用
+- 或按快捷键 1-4 使用对应位置的道具
+
+
+九、关卡系统配置
+==================
+
+9.1 关卡管理器设置
+------------------
+
+在 GameManager 对象下添加 [LevelManager] 子对象：
+├── [LevelManager] (空物体)
+│   └── LevelManager.cs (脚本)
+│       └── levels: 关卡配置列表 (可手动配置或使用默认 10 关)
+
+
+9.2 关卡难度递进
+------------------
+
+关卡难度会随着关卡提升而增加：
+
+| 关卡 | 老板速度 | 检测间隔 | 检测范围 | 检测时间 | 目标分数 |
+|------|----------|----------|----------|----------|----------|
+| 1    | 2.0      | 10.0s    | 4.0m     | 1.0s     | 300      |
+| 2    | 2.2      | 9.4s     | 4.2m     | 0.9s     | 450      |
+| 3    | 2.4      | 8.8s     | 4.4m     | 0.8s     | 600      |
+| 4    | 2.6      | 8.2s     | 4.6m     | 0.7s     | 750      |
+| 5    | 2.8      | 7.6s     | 4.8m     | 0.6s     | 900      |
+| 6    | 3.0      | 7.0s     | 5.0m     | 0.5s     | 1050     |
+| 7    | 3.2      | 6.4s     | 5.2m     | 0.5s     | 1200     |
+| 8    | 3.4      | 5.8s     | 5.4m     | 0.4s     | 1350     |
+| 9    | 3.6      | 5.2s     | 5.6m     | 0.4s     | 1500     |
+| 10   | 3.8      | 4.6s     | 5.8m     | 0.3s     | 1650     |
+
+
+9.3 关卡选择 UI
+----------------
+
+主菜单添加关卡选择面板：
+
+├── [LevelSelectPanel] (Image - 面板)
+│   ├── LevelSelectController.cs (脚本)
+│   │   ├── levelButtonPrefab: 关卡按钮预制体
+│   │   ├── levelContainer: 关卡按钮容器
+│   │   └── backButton: 返回按钮
+│   │
+│   ├── BackButton (Button - 返回主菜单)
+│   └── [LevelGrid] (Grid Layout Group)
+│       ├── LevelButton_01 (Button)
+│       ├── LevelButton_02 (Button)
+│       └── ...
+
+
+9.4 关卡进度保存
+------------------
+
+关卡进度通过 PlayerPrefs 保存：
+- Key: "UnlockedLevel"
+- Value: 已解锁的最高关卡索引 (0 表示第 1 关)
+
+通关条件：
+- 达到目标分数
+- 或在限定时间内存活
+
+
+十、游戏结束界面增强
+==================
+
+10.1 游戏结束面板配置
+-----------------------
+
+更新 GameOverPanel 添加以下元素：
+
+├── [GameOverPanel] (Image - 面板)
+│   ├── BG (Image - 半透明背景)
+│   ├── TitleText (TMP_Text - "游戏结束")
+│   ├── FinalScoreText (TMP_Text - "本次摸鱼值: 1234")
+│   ├── HighScoreText (TMP_Text - "历史最高: 2000")
+│   ├── IsNewHighScoreText (TMP_Text - "🎉 新纪录！")
+│   │   └── 默认隐藏
+│   ├── StatsPanel (可选 - 统计信息)
+│   │   ├── FishingCountText (TMP_Text - "摸鱼次数: 15")
+│   │   ├── CaughtCountText (TMP_Text - "被抓次数: 2")
+│   │   └── BestComboText (TMP_Text - "最高连击: 5")
+│   ├── RestartButton (Button - 再来一局)
+│   ├── MainMenuButton (Button - 返回主菜单)
+│   └── LeaderboardButton (Button - 查看排行榜)
+
+
+10.2 GameHUDController 配置
+-----------------------------
+
+在 GameHUDController 中设置：
+- highScoreText: 关联到历史最高分文本
+- isNewHighScoreText: 关联到新纪录提示文本
+- leaderboardButton: 关联到排行榜按钮
+
+
+十一、测试步骤
+=============
+
+1. 点击 Play 运行场景
+2. 鼠标悬停在物品上，应该看到高亮效果
+3. 点击非电脑物品开始摸鱼，弹出小游戏面板
+4. 完成小游戏后获得分数，底部显示进度条
+5. 点击电脑停止摸鱼，进度条消失
+6. 摸鱼时老板进入检测范围，顶部显示警告
+7. 被抓后扣血扣连击，2秒后恢复
+8. 使用道具：点击道具槽位或按 1-4 键
+9. 验证道具效果：老板变慢、玩家隐身等
+10. 血量归零或时间到，显示游戏结束面板
+11. 查看游戏结束界面：显示本次摸鱼值和历史最高
+12. 暂停按钮可以暂停/继续游戏
+13. 查看主菜单排行榜，确认分数已保存
+14. 切换关卡，验证难度变化

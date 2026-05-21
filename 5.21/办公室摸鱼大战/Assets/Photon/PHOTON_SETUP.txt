@@ -1,0 +1,39 @@
+Photon PUN 2 配置说明
+=====================
+
+本项目已在 Packages/manifest.json 中配置了 Photon PUN 2 (v2.44.1)。
+
+配置步骤：
+
+1. 注册 Photon 账号
+   - 访问 https://www.photonengine.com/
+   - 注册账号并登录
+   - 创建新的 PUN 应用
+   - 复制 App ID
+
+2. 在 Unity 中配置
+   方法 A（推荐）：
+   - 打开 Unity 菜单：Window > Photon Unity Networking > PhotonServerSettings
+   - 点击 "Use Existing"（如果已有配置）或 "Setup Project"
+   - 粘贴 App ID 到 App Id Realtime 字段
+   - 设置 App Version (例如：0.1.0)
+   
+   方法 B：
+   - 当 Unity 导入 PUN 2 包后，会自动弹出配置窗口
+   - 输入邮箱和 App ID 完成配置
+
+3. 验证配置
+   - PhotonServerSettings 资源文件会自动生成在 Assets/Photon/Resources/ 目录
+   - 打开该文件检查 App ID 是否已正确填入
+   - 在代码中通过 PhotonNetwork.PhotonServerSettings.AppSettings.AppIdRealtime 访问
+
+4. 本项目配置
+   - 网络管理器：Scripts/Network/NetworkManager.cs
+   - 单例基类：Scripts/Network/SingletonPun.cs
+   - 玩家数据：Scripts/Network/PlayerData.cs
+   - 默认最大玩家数：4 (可在 GameSettings.cs 中修改)
+
+注意事项：
+- 本项目已配置 OpenUPM 作为包源，支持 ExitGames 包自动更新
+- RPC 方法已在代码中定义，无需手动注册
+- 如需使用 Photon Voice 或 Chat，需要额外申请 App ID 并配置
