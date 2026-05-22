@@ -1,0 +1,32 @@
+.header {
+  height: 60px;
+  background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+  border-bottom: 1px solid #2a2a4a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.header-title h1 {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.header-nav {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-item {
+  color: #a0a0c0;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.nav-item:hover {
+  color: #4a90d9;
+}

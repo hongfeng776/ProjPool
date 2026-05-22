@@ -1,0 +1,190 @@
+角色操控功能使用指南
+====================
+
+## 控制按键
+
+| 按键 | 功能 |
+|------|------|
+| A / 左方向键 | 向左移动 |
+| D / 右方向键 | 向右移动 |
+| 空格键 / W / 上方向键 | 跳跃 |
+| ESC | 暂停 |
+
+## 脚本说明
+
+### PlayerController.cs
+主玩家控制器，包含完整的平台游戏移动功能：
+
+**移动特性：**
+- 平滑加速/减速
+- 地面摩擦力
+- 移动时自动翻转
+
+**跳跃特性：**
+- 土狼时间 (Coyote Time): 离开地面后短暂时间仍可跳跃
+- 跳跃缓冲 (Jump Buffer): 提前按下跳跃键会缓冲
+- 可变跳跃高度: 松开跳跃键提前结束跳跃
+- 二段跳支持
+- 下落时重力加速
+
+**边界限制：**
+- 自动限制角色在设定边界内
+- 碰撞边界时停止移动
+
+**Inspector 可配置参数：**
+- Move Speed: 移动速度 (默认5)
+- Jump Force: 跳跃力度 (默认12)
+- Gravity Scale: 重力缩放 (默认3)
+- Max Jumps: 最大跳跃次数 (默认2)
+- Boundary Min/Max: 边界范围
+
+### PlayerInput.cs
+独立的输入管理脚本：
+
+**功能：**
+- 支持 Input Axis 和按键两种模式
+- 可自定义按键映射
+- 输入启用/禁用控制
+- 事件回调系统
+
+### GroundDetector.cs
+地面检测脚本：
+
+**功能：**
+- 多点位地面检测
+- 落地/离地事件回调
+- 可配置检测半径和图层
+
+### SceneBoundary.cs
+场景边界系统：
+
+**功能：**
+- 自动根据摄像机计算边界
+- 可创建物理碰撞器边界
+- 可配置内边距
+
+### PlayerInitializer.cs
+玩家初始化脚本：
+
+**功能：**
+- 自动创建默认玩家
+- 可配置出生点
+- 自动设置边界
+- 生成默认精灵（如果没有预制体）
+
+## Unity 编辑器设置步骤
+
+### 1. 创建玩家对象
+
+**方式一：使用 PlayerInitializer（推荐）**
+1. 在场景中创建空物体，命名为 "PlayerManager"
+2. 添加 PlayerInitializer 组件
+3. 调整边界范围和出生位置
+4. 运行游戏会自动创建玩家
+
+**方式二：手动创建**
+1. 创建 Sprite 作为玩家视觉
+2. 添加以下组件：
+   - Rigidbody2D (BodyType: Dynamic, FreezeRotation: true)
+   - CapsuleCollider2D
+   - PlayerController
+3. 设置 Tag 为 "Player"
+4. 配置 PlayerController 参数
+
+### 2. 设置地面图层
+
+1. 进入 Edit -> Project Settings -> Tags and Layers
+2. 在 User Layer 8 命名为 "Ground"
+3. 将所有地面平台的 Layer 设置为 Ground
+
+### 3. 创建地面平台
+
+1. 创建 Sprite 或 Tilemap 作为地面
+2. 添加 BoxCollider2D 或 CompositeCollider2D
+3. 设置 Layer 为 Ground
+
+### 4. 设置边界
+
+**方式一：PlayerController 内置边界**
+1. 在 PlayerController 中勾选 Use Boundary
+2. 设置 Boundary Min 和 Boundary Max
+
+**方式二：SceneBoundary 对象**
+1. 创建空物体命名为 "SceneBoundary"
+2. 添加 SceneBoundary 组件
+3. 勾选 Auto Calculate 或手动设置边界
+4. 勾选 Create Edge Colliders 创建物理边界
+
+### 5. 摄像机设置
+
+1. 添加 Camera 组件
+2. Projection: Orthographic
+3. Size: 5 (根据需要调整)
+4. Clear Flags: Solid Color
+5. Background: 深灰色
+
+## 代码示例
+
+### 获取玩家控制器
+```csharp
+PlayerController player = PlayerController.Instance;
+```
+
+### 修改移动速度
+```csharp
+player.SetMoveSpeed(7f);
+```
+
+### 修改跳跃力度
+```csharp
+player.SetJumpForce(15f);
+```
+
+### 设置边界
+```csharp
+Vector2 min = new Vector2(-10, -5);
+Vector2 max = new Vector2(10, 5);
+player.SetBoundary(min, max);
+player.EnableBoundary(true);
+```
+
+### 传送玩家
+```csharp
+player.Teleport(new Vector3(0, 0, 0));
+```
+
+### 监听输入事件
+```csharp
+PlayerInput input = GetComponent<PlayerInput>();
+input.OnJumpPressed += () => {
+    Debug.Log("跳跃按下");
+};
+```
+
+## 常见问题
+
+### 1. 角色穿透地面
+- 检查 Rigidbody2D 的 Collision Detection 是否设置为 Continuous
+- 检查地面是否有 Collider2D
+- 检查地面 Layer 是否正确设置
+
+### 2. 跳跃感觉不流畅
+- 调整 Coyote Time (0.05-0.15)
+- 调整 Jump Buffer Time (0.05-0.15)
+- 调整 Jump Cut Multiplier (0.3-0.7)
+
+### 3. 角色滑出场景
+- 确保 Use Boundary 已勾选
+- 检查 Boundary Min/Max 数值是否正确
+- 或者使用 SceneBoundary 创建物理边界
+
+### 4. 移动速度过快/过慢
+- 调整 Move Speed 参数
+- 调整 Acceleration 和 Deceleration
+
+## 性能优化
+
+1. 地面检测半径尽量小
+2. 边界检查使用 Mathf.Clamp 很高效
+3. 避免在 Update 中频繁修改参数
+4. 使用对象池复用特效

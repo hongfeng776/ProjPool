@@ -1,0 +1,236 @@
+道具收集玩法使用指南
+====================
+
+## 功能概述
+
+实现完整的道具收集系统，包括：
+- 随机道具生成
+- 角色触碰拾取
+- 收集数量统计
+- HUD界面显示
+- 收集动画效果
+
+## 脚本说明
+
+### ItemData.cs (ScriptableObject)
+道具数据配置文件，可在编辑器中创建：
+- 菜单: Create -> Pixel Adventure -> Item Data
+
+**可配置参数：**
+- Item Name: 道具名称
+- Item Type: 道具类型（Coin, Gem, Star, Key, Heart, PowerUp, Custom）
+- Value: 道具价值
+- Icon: 道具图标
+- Color: 显示颜色
+- Float Animation: 浮动动画开关
+- Rotate Animation: 旋转动画开关
+
+### PickupItem.cs
+可拾取道具组件，挂载到道具对象上：
+
+**功能：**
+- 自动生成默认精灵（无需美术资源）
+- 浮动和旋转动画
+- 触发检测拾取
+- 自动销毁/隐藏
+
+**Inspector 配置：**
+- Item Data: 关联道具数据
+- Player Tag: 玩家标签（默认 "Player"）
+- Player Layer: 玩家图层
+
+### ItemManager.cs
+道具管理器（单例）：
+
+**功能：**
+- 按类型统计道具数量
+- 收集事件回调
+- 存档进度同步
+- 防重复收集
+
+**事件：**
+- OnItemCountChanged: 数量变化时触发
+- OnItemCollected: 收集道具时触发
+- OnCollectionComplete: 收集完成时触发
+
+### ItemSpawner.cs
+道具随机生成器：
+
+**功能：**
+- 区域内随机生成
+- 障碍物碰撞检测
+- 权重随机分配
+- 自动创建默认道具
+
+**Inspector 配置：**
+- Item Count: 生成数量
+- Spawn Area Min/Max: 生成区域
+- Obstacle Layer: 障碍物图层
+- Item Prefabs: 道具预制体数组
+- Item Weights: 生成权重
+
+### ItemCounterUI.cs
+单个道具计数UI：
+
+**功能：**
+- 自动创建图标
+- 实时更新数量
+- 收集动画效果
+- 支持多种显示格式
+
+### HUDController.cs
+HUD控制器：
+
+**功能：**
+- 自动创建道具计数器
+- 显示/隐藏控制
+- 默认显示：金币、宝石、星星
+
+## Unity 编辑器设置步骤
+
+### 1. 快速设置（推荐）
+
+**使用 GameSceneBootstrap 自动初始化：**
+1. 打开游戏场景 `GameScene.unity`
+2. 创建空物体命名为 "Bootstrap"
+3. 添加 `GameSceneBootstrap` 组件
+4. 调整参数：
+   - Player Spawn Position: 玩家出生点
+   - Spawn Area Min/Max: 道具生成区域
+   - Item Count: 道具数量（默认10）
+5. 运行游戏即可自动创建所有内容
+
+### 2. 手动设置
+
+**步骤 1: 创建地面**
+1. 创建 Sprite 作为地面平台
+2. 添加 BoxCollider2D
+3. 设置 Layer 为 "Ground"
+
+**步骤 2: 添加道具生成器**
+1. 创建空物体命名为 "ItemSpawner"
+2. 添加 `ItemSpawner` 组件
+3. 设置生成区域和数量
+4. （可选）添加道具预制体和数据
+
+**步骤 3: 添加 HUD**
+1. 创建空物体命名为 "HUD"
+2. 添加 `HUDController` 组件
+3. 运行时会自动创建道具计数器
+
+**步骤 4: 确保有玩家**
+- 使用 PlayerInitializer 或手动创建带 PlayerController 的玩家
+
+### 3. 创建自定义道具数据
+
+1. 右键 Project 窗口 -> Create -> Pixel Adventure -> Item Data
+2. 配置道具参数
+3. 将道具数据拖入 ItemSpawner 的 Item Datas 数组
+4. 或创建道具预制体，挂载 PickupItem 并关联 ItemData
+
+## 代码示例
+
+### 获取道具数量
+```csharp
+// 获取金币数量
+int coinCount = ItemManager.Instance.GetItemCount(ItemType.Coin);
+
+// 获取总收集数
+int total = ItemManager.Instance.TotalItemsCollected;
+```
+
+### 监听收集事件
+```csharp
+// 监听特定类型数量变化
+ItemManager.Instance.OnItemCountChanged += (type, count) => {
+    if (type == ItemType.Coin) {
+        Debug.Log($"金币: {count}");
+    }
+};
+
+// 监听任何道具收集
+ItemManager.Instance.OnItemCollected += (item) => {
+    Debug.Log($"收集了 {item.ItemData.itemName}");
+};
+```
+
+### 手动生成道具
+```csharp
+ItemSpawner spawner = FindObjectOfType<ItemSpawner>();
+spawner.SpawnAllItems(); // 重新生成所有道具
+spawner.SpawnRandomItem(); // 生成一个随机道具
+```
+
+### 重置收集
+```csharp
+ItemManager.Instance.ResetAllCounts(); // 重置所有
+ItemManager.Instance.ResetTypeCount(ItemType.Coin); // 重置特定类型
+```
+
+## 道具类型
+
+| 类型 | 颜色 | 说明 |
+|------|------|------|
+| Coin | 黄色 | 金币，基础货币 |
+| Gem | 青色 | 宝石，高级货币 |
+| Star | 白色 | 星星，评分使用 |
+| Key | 橙色 | 钥匙，解锁门 |
+| Heart | 红色 | 生命，恢复血量 |
+| PowerUp | 绿色 | 能力提升 |
+| Custom | 灰色 | 自定义 |
+
+## 自定义扩展
+
+### 添加新道具类型
+
+1. 在 `ItemType` 枚举中添加新类型
+2. 在 `ItemCounterUI.GetColorForType()` 中添加对应颜色
+3. 创建新的 ItemData 配置
+
+### 修改收集逻辑
+
+在 `PickupItem.OnPickedUp()` 中修改：
+```csharp
+private void OnPickedUp(GameObject player)
+{
+    // 添加自定义效果
+    PlayerController playerCtrl = player.GetComponent<PlayerController>();
+    playerCtrl.SetMoveSpeed(8f); // 加速效果
+
+    // 原有逻辑...
+}
+```
+
+### 创建拾取特效
+
+1. 创建特效预制体
+2. 在 `PickupItem.OnPickedUp()` 中实例化：
+```csharp
+Instantiate(effectPrefab, transform.position, Quaternion.identity);
+```
+
+## 常见问题
+
+### 1. 道具不显示
+- 检查 ItemSpawner 的生成区域是否合理
+- 检查是否有障碍物阻挡生成
+
+### 2. 角色无法拾取道具
+- 确保玩家 Tag 为 "Player"
+- 确保道具的 Collider2D 是 Trigger
+- 确保玩家有 Collider2D 和 Rigidbody2D
+
+### 3. HUD 不显示
+- 检查是否有 HUDController
+- 检查 Canvas 的 RenderMode 是否正确
+
+### 4. 收集动画不播放
+- 确保 ItemCounterUI 的 Animate On Collect 已勾选
+- 确保道具类型匹配
+
+## 性能优化
+
+1. 道具数量不宜过多（建议 < 50）
+2. 复杂动画可以用对象池
+3. 大量道具时考虑分批生成
+4. 禁用不需要的动画效果

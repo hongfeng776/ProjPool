@@ -1,0 +1,96 @@
+.minimap {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 240px;
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+  border: 1px solid rgba(74, 144, 217, 0.4);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.minimap-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(74, 144, 217, 0.3);
+  background: linear-gradient(90deg, rgba(74, 144, 217, 0.15), transparent);
+}
+
+.minimap-header h3 {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.minimap-content {
+  padding: 12px;
+}
+
+.minimap-svg {
+  display: block;
+  border-radius: 8px;
+  background: rgba(10, 10, 30, 0.5);
+}
+
+.minimap-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-dot.normal {
+  background: #27ae60;
+  box-shadow: 0 0 6px #27ae60;
+}
+
+.legend-dot.warning {
+  background: #f39c12;
+  box-shadow: 0 0 6px #f39c12;
+}
+
+.legend-dot.error {
+  background: #e74c3c;
+  box-shadow: 0 0 6px #e74c3c;
+}
+
+.legend-item span {
+  color: #a0a0b0;
+  font-size: 11px;
+}
+
+@media (max-width: 768px) {
+  .minimap {
+    width: 180px;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .minimap-svg {
+    width: 156px;
+    height: 156px;
+  }
+}
+
+@media (max-width: 480px) {
+  .minimap {
+    display: none;
+  }
+}

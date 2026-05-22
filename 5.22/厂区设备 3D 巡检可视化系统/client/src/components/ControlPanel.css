@@ -1,0 +1,133 @@
+.control-panel {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  width: 220px;
+  background: rgba(26, 26, 46, 0.95);
+  border: 1px solid #3a3a5a;
+  border-radius: 12px;
+  padding: 16px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.panel-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #3a3a5a;
+}
+
+.panel-header h3 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.panel-section {
+  margin-bottom: 16px;
+}
+
+.panel-section h4 {
+  color: #a0a0c0;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 10px 0;
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.mode-buttons button {
+  flex: 1;
+  padding: 10px 8px;
+  font-size: 12px;
+  border: 1px solid #3a3a5a;
+  border-radius: 8px;
+  background: #1e1e3a;
+  color: #a0a0c0;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.mode-buttons button:hover {
+  background: #2a2a4a;
+  color: #ffffff;
+}
+
+.mode-buttons button.active {
+  background: linear-gradient(135deg, #4a90d9, #357abd);
+  border-color: #4a90d9;
+  color: #ffffff;
+}
+
+.view-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.view-buttons button {
+  padding: 10px 6px;
+  font-size: 11px;
+  border: 1px solid #3a3a5a;
+  border-radius: 6px;
+  background: #1e1e3a;
+  color: #a0a0c0;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.view-buttons button:hover {
+  background: #2a2a4a;
+  color: #ffffff;
+  border-color: #4a90d9;
+}
+
+.keyboard-hints p {
+  color: #8080a0;
+  font-size: 11px;
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.key-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin: 10px 0;
+  width: 100px;
+}
+
+.key {
+  background: #2a2a4a;
+  border: 1px solid #4a4a6a;
+  border-radius: 4px;
+  padding: 8px 4px;
+  text-align: center;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.reset-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.reset-button:hover {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: translateY(-1px);
+}

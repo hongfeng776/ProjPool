@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业月度营收数据分析平台</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <h1>📊 企业月度营收数据分析平台</h1>
+                <p class="header-subtitle">数据驱动决策 · 智能营收管理</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-warning" id="anomalyBtn" onclick="showAnomalyModal()">
+                    <span>⚠️</span> 异常预警 <span class="badge" id="anomalyBadge">0</span>
+                </button>
+                <div class="export-dropdown">
+                    <button class="btn btn-success" onclick="toggleExportMenu()">
+                        <span>📥</span> 导出报表
+                    </button>
+                    <div class="export-menu" id="exportMenu">
+                        <div class="export-item" onclick="exportRevenue('excel')">
+                            <span>📊</span> 营收明细 (Excel)
+                        </div>
+                        <div class="export-item" onclick="exportRevenue('csv')">
+                            <span>📄</span> 营收明细 (CSV)
+                        </div>
+                        <div class="export-item" onclick="exportSummary()">
+                            <span>📈</span> 汇总报表 (Excel)
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" onclick="showAddForm()">
+                    <span>+</span> 新增营收
+                </button>
+            </div>
+        </header>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-icon blue">💰</div>
+                <div class="card-content">
+                    <div class="card-title">总营收</div>
+                    <div class="card-value" id="totalRevenue">¥ 0.00</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon green">📅</div>
+                <div class="card-content">
+                    <div class="card-title">本月营收</div>
+                    <div class="card-value" id="monthRevenue">¥ 0.00</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon orange">📈</div>
+                <div class="card-content">
+                    <div class="card-title">环比增长</div>
+                    <div class="card-value" id="monthOnMonth">0%</div>
+                    <div class="card-trend neutral">
+                        <span>较上月</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon purple">🏢</div>
+                <div class="card-content">
+                    <div class="card-title">覆盖部门</div>
+                    <div class="card-value" id="departmentCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title-group">
+                    <h2>📈 营收趋势分析</h2>
+                    <div class="chart-type-tabs" id="chartTypeTabs">
+                        <button class="tab-btn active" data-type="trend" onclick="switchChartType('trend')">趋势图</button>
+                        <button class="tab-btn" data-type="compare" onclick="switchChartType('compare')">同比对比</button>
+                        <button class="tab-btn" data-type="mom" onclick="switchChartType('mom')">环比分析</button>
+                    </div>
+                </div>
+                <div class="section-filters">
+                    <select id="chartYear" class="select-input" onchange="loadAllCharts()">
+                    </select>
+                    <div class="chart-style-switch">
+                        <button class="style-btn" onclick="switchChartStyle('bar')" title="柱状图">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="12" width="4" height="9"></rect>
+                                <rect x="10" y="6" width="4" height="15"></rect>
+                                <rect x="17" y="9" width="4" height="12"></rect>
+                            </svg>
+                        </button>
+                        <button class="style-btn active" onclick="switchChartStyle('line')" title="折线图">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18"></path>
+                                <path d="M18 9l-5 5-4-4-6 6"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container" id="mainChart"></div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>🏢 部门营收</h2>
+                </div>
+                <div class="chart-container" id="deptChart"></div>
+            </div>
+            <div class="section-card">
+                <div class="section-header">
+                    <h2>🗺️ 地区分布</h2>
+                </div>
+                <div class="chart-container" id="regionChart"></div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <h2>💼 业务类型占比</h2>
+            </div>
+            <div class="chart-container" id="businessChart"></div>
+        </div>
+
+        <div class="section-card">
+            <div class="section-header">
+                <h2>📋 营收单据管理</h2>
+                <div class="section-filters">
+                    <select id="filterDepartment" class="select-input" onchange="loadRevenueList()">
+                        <option value="">全部部门</option>
+                    </select>
+                    <select id="filterYear" class="select-input" onchange="loadRevenueList()">
+                        <option value="">全部年份</option>
+                    </select>
+                    <select id="filterMonth" class="select-input" onchange="loadRevenueList()">
+                        <option value="">全部月份</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadRevenueList()">查询</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>部门</th>
+                            <th>营收金额</th>
+                            <th>交易日期</th>
+                            <th>业务类型</th>
+                            <th>地区</th>
+                            <th>录入时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="revenueTableBody">
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <div class="empty-icon">📋</div>
+                                <p>暂无数据，点击"新增营收"添加单据</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination" id="pagination">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新增营收单据</h3>
+                <button class="close-btn" onclick="closeModal('addModal')">&times;</button>
+            </div>
+            <form id="revenueForm" onsubmit="submitForm(event)">
+                <div class="form-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">部门 <span class="required">*</span></label>
+                            <select id="formDepartment" class="form-control" required>
+                                <option value="">请选择部门</option>
+                                <option value="销售部">销售部</option>
+                                <option value="市场部">市场部</option>
+                                <option value="技术部">技术部</option>
+                                <option value="运营部">运营部</option>
+                                <option value="财务部">财务部</option>
+                                <option value="人力资源部">人力资源部</option>
+                                <option value="产品部">产品部</option>
+                                <option value="客服部">客服部</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">营收金额 <span class="required">*</span></label>
+                            <input type="number" id="formAmount" class="form-control" 
+                                   placeholder="请输入金额" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">交易日期 <span class="required">*</span></label>
+                            <input type="date" id="formDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">业务类型</label>
+                            <select id="formBusinessType" class="form-control">
+                                <option value="">请选择</option>
+                                <option value="产品销售">产品销售</option>
+                                <option value="服务收入">服务收入</option>
+                                <option value="咨询服务">咨询服务</option>
+                                <option value="技术支持">技术支持</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">地区</label>
+                            <select id="formRegion" class="form-control">
+                                <option value="">请选择</option>
+                                <option value="华东">华东</option>
+                                <option value="华南">华南</option>
+                                <option value="华北">华北</option>
+                                <option value="华中">华中</option>
+                                <option value="西南">西南</option>
+                                <option value="西北">西北</option>
+                                <option value="东北">东北</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">客户类型</label>
+                            <select id="formCustomerType" class="form-control">
+                                <option value="">请选择</option>
+                                <option value="企业客户">企业客户</option>
+                                <option value="个人客户">个人客户</option>
+                                <option value="政府机构">政府机构</option>
+                                <option value="合作伙伴">合作伙伴</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">公司名称</label>
+                        <input type="text" id="formCompanyName" class="form-control" 
+                               placeholder="请输入公司名称">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addModal')">取消</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">提交</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="anomalyModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>⚠️ 异常数据预警</h3>
+                <button class="close-btn" onclick="closeModal('anomalyModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="anomalyContent">
+                <div class="empty-state">
+                    <div class="empty-icon">✅</div>
+                    <p>暂无异常数据</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

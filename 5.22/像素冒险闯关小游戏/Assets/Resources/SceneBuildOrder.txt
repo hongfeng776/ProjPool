@@ -1,0 +1,11 @@
+场景构建设置顺序 (Build Settings):
+
+0. Boot
+1. MainMenu  
+2. GameScene
+3. LevelSelect (可选)
+
+在 Unity 中:
+1. File -> Build Settings...
+2. 依次添加上述场景
+3. 确保 Boot 场景索引为 0

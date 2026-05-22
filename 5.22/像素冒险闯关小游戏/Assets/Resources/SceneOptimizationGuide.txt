@@ -1,0 +1,145 @@
+场景切换卡顿优化指南
+====================
+
+## 已实现的优化功能
+
+### 1. 淡入淡出过渡 (FadeTransition)
+- 位置: Assets/Scripts/UI/FadeTransition.cs
+- 功能: 场景切换时的平滑黑屏过渡
+- 配置: 默认0.3秒，可在SceneLoader中调整
+
+### 2. 加载屏幕 (LoadingScreen)
+- 位置: Assets/Scripts/UI/LoadingScreen.cs
+- 功能: 显示加载进度条和提示文本
+- 特点:
+  * 平滑的进度条动画
+  * 随机加载提示
+  * 自动创建默认UI（无需手动绑定）
+
+### 3. 场景加载流程优化 (SceneLoader)
+优化后的加载流程:
+1. 淡出当前场景 (0.3s)
+2. 显示加载屏幕
+3. 淡入加载屏幕
+4. 异步加载目标场景
+5. GC回收
+6. 卸载未使用资源
+7. 隐藏加载屏幕
+8. 淡入新场景
+
+### 4. 性能优化器 (PerformanceOptimizer)
+- 位置: Assets/Scripts/Core/PerformanceOptimizer.cs
+- 功能:
+  * 自动内存监控
+  * 定时GC回收
+  * 低功耗模式
+  * 画质等级控制
+
+### 5. 对象池系统 (ObjectPool)
+- 位置: Assets/Scripts/Core/ObjectPool.cs
+- 功能: 减少运行时Instantiate/Destroy的性能开销
+
+## Unity编辑器配置建议
+
+### 1. 构建设置 (Build Settings)
+- 按顺序添加所有场景到 Build Settings
+- 确保 Boot 场景索引为 0
+
+### 2. 玩家设置 (Player Settings)
+- 进入 Edit -> Project Settings -> Player
+- 推荐设置:
+  * Color Space: Linear (如果支持)
+  * API Compatibility Level: .NET Standard 2.1
+  * Strip Engine Code: Enabled (发布时)
+
+### 3. 质量设置 (Quality Settings)
+- 进入 Edit -> Project Settings -> Quality
+- 为每个等级设置合适的参数
+- 关闭不需要的效果
+
+### 4. 图形设置 (Graphics Settings)
+- 预加载常用着色器
+- 配置 SRP Batcher (如果使用 URP/HDRP)
+
+## 常见卡顿原因及解决方案
+
+### 1. 场景加载时卡顿
+原因: 场景资源过多，同步加载阻塞主线程
+解决方案:
+- 使用 Addressables 资源管理系统
+- 拆分大型场景为多个子场景
+- 使用 Additive 模式加载场景
+- 预加载常用资源
+
+### 2. 场景激活时卡顿
+原因: Awake/Start 中执行过多逻辑
+解决方案:
+- 将初始化逻辑分散到多帧
+- 使用协程分批初始化
+- 非关键资源延迟加载
+
+### 3. GC 导致的卡顿
+原因: 频繁创建临时对象
+解决方案:
+- 使用对象池复用对象
+- 避免在 Update 中分配内存
+- 使用 struct 代替 class
+- 字符串操作使用 StringBuilder
+
+### 4. 渲染卡顿
+原因: 渲染批处理过多
+解决方案:
+- 启用 GPU Instancing
+- 使用静态批处理
+- 合并材质和纹理
+- 减少 Overdraw
+
+## 代码最佳实践
+
+### 场景加载
+```csharp
+// 推荐: 带回调的异步加载
+SceneLoader.Instance.LoadGameScene(() => {
+    Debug.Log("场景加载完成");
+});
+```
+
+### 内存管理
+```csharp
+// 切换场景时手动释放
+Resources.UnloadUnusedAssets();
+System.GC.Collect();
+```
+
+### 对象池使用
+```csharp
+// 创建池
+var pool = ObjectPoolManager.Instance.CreatePool("Enemy", enemyPrefab, 20);
+
+// 获取对象
+var enemy = pool.Get();
+
+// 归还对象
+pool.Return(enemy);
+```
+
+## 性能分析工具
+
+### Unity 内置工具
+1. Profiler: Window -> Analysis -> Profiler
+2. Frame Debugger: Window -> Analysis -> Frame Debugger
+3. Memory Profiler: Package Manager 安装
+
+### 关键指标
+- CPU: 主线程耗时
+- GPU: 渲染耗时
+- Memory: 内存分配
+- GC Alloc: 每帧GC分配
+
+## 移动端优化
+
+1. 降低目标帧率 (30 FPS)
+2. 降低分辨率
+3. 简化着色器
+4. 减少 Draw Call
+5. 启用 LOD 系统
