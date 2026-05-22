@@ -1,0 +1,25 @@
+{
+  "name": "molecular-orbital-visualizer",
+  "version": "1.0.0",
+  "description": "分子轨道动态交互演示器",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx vite",
+    "build": "npx vite build",
+    "preview": "npx vite preview"
+  },
+  "keywords": [
+    "three.js",
+    "molecular",
+    "orbital",
+    "visualization"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

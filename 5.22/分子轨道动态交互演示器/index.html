@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分子轨道动态交互演示器</title>
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>分子轨道动态交互演示器</h1>
+      <p>Molecular Orbital Visualizer</p>
+    </header>
+    
+    <main class="main-container">
+      <div id="canvas-container" class="canvas-container"></div>
+      
+      <aside class="control-panel">
+        <h2>控制面板</h2>
+        <div class="control-group">
+          <label>轨道类型</label>
+          <select id="orbital-type">
+            <option value="1s">1s (基态)</option>
+            <option value="2px">2pₓ</option>
+            <option value="2py">2pᵧ</option>
+            <option value="2pz">2pz</option>
+            <option value="3dxy">3d<sub>xy</sub></option>
+            <option value="3dxz">3d<sub>xz</sub></option>
+            <option value="3dyz">3d<sub>yz</sub></option>
+            <option value="3dx2y2">3d<sub>x²-y²</sub></option>
+            <option value="3dz2">3d<sub>z²</sub></option>
+          </select>
+        </div>
+        <div class="control-group color-legend" id="color-legend">
+          <div class="legend-item">
+            <span class="legend-color positive"></span>
+            <span>正相位 (+)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color negative"></span>
+            <span>负相位 (-)</span>
+          </div>
+        </div>
+        <div class="control-group info-group" id="orbital-info">
+          <h3 id="orbital-name">氢原子 1s 轨道</h3>
+          <p class="orbital-info" id="orbital-formula">ψ₁ₛ(r) = (1/√πa₀³) · e<sup>-r/a₀</sup></p>
+          <p class="orbital-desc" id="orbital-desc">球对称的基态轨道，电子概率密度随距离指数衰减</p>
+        </div>
+        <div class="control-group">
+          <label>等值面阈值</label>
+          <input type="range" id="isolevel" min="0.1" max="2.0" step="0.1" value="0.5">
+          <span id="isolevel-value">0.5</span>
+        </div>
+        <div class="control-group">
+          <label>表面透明度</label>
+          <input type="range" id="opacity" min="0.1" max="1" step="0.1" value="0.7">
+          <span id="opacity-value">0.7</span>
+        </div>
+        <div class="control-group">
+          <label>
+            <input type="checkbox" id="show-cloud" checked>
+            显示概率云
+          </label>
+        </div>
+        <div class="control-group">
+          <label>
+            <input type="checkbox" id="auto-rotate" checked>
+            自动旋转
+          </label>
+        </div>
+        <div class="control-group hint-group">
+          <h4>操作提示</h4>
+          <ul>
+            <li>🖱️ 左键拖拽：旋转视角</li>
+            <li>🖱️ 滚轮：缩放</li>
+            <li>🖱️ 右键拖拽：平移</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+    
+    <footer class="footer">
+      <p>使用 Three.js 构建 | 拖拽旋转 | 滚轮缩放</p>
+    </footer>
+  </div>
+  
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

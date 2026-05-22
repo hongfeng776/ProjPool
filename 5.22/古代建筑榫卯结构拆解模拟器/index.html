@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>榫卯结构拆解模拟器</title>
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>榫卯结构拆解模拟器</h1>
+            <p class="subtitle">探索中国古代建筑的智慧</p>
+        </header>
+        <div class="controls">
+            <button id="explodeBtn">整体拆解</button>
+            <button id="stepPrevBtn">上一步</button>
+            <button id="stepNextBtn">下一步</button>
+            <button id="resetBtn">重置</button>
+            <button id="rotateBtn">自动旋转</button>
+            <select id="jointSelect">
+                <option value="dovetail" selected>燕尾榫</option>
+                <option value="basic">基本榫卯</option>
+            </select>
+        </div>
+        <div class="step-indicator">
+            <span id="stepText">步骤: 0 / 4</span>
+            <div class="step-bar">
+                <div id="stepProgress" class="step-progress"></div>
+            </div>
+        </div>
+        <div class="info-panel">
+            <div class="info-title">结构说明</div>
+            <div id="infoContent" class="info-content">
+                燕尾榫是一种传统的木工连接方式，因其形状酷似燕子尾巴而得名。这种结构具有极强的抗拉强度，是古代建筑和家具中最常用的榫卯结构之一。
+            </div>
+        </div>
+        <div id="scene-container"></div>
+        <footer class="footer">
+            <p>使用鼠标拖拽旋转 | 滚轮缩放 | 右键平移</p>
+        </footer>
+    </div>
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>
