@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!169 &1
+UnityConnectSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_EventServiceEnabled: 0
+  m_EventServiceOldEnableState: 0
+  m_PrivacyUrl: 
+  m_AnalyticsEnabled: 0
+  m_ConnectLogEnabled: 1
+  m_TestEnabled: 0
+  m_CrashedReportingEnabled: 0
+  m_UnityPurchasingEnabled: 0
+  m_UnityAdsEnabled: 0
+  m_EnableTechSeminar: 1
+  m_TestAutomationEnabled: 0
+  m_ConnectInfo:
+    token: 
+    token_secret: 
+    environment: 
+    display_name: 
+    organization_id: 
+    organization_name: 
+    project_guid: 
+    project_name: 
+    project_created_at: 
+    project_platform: 
+    serializedVersion: 1
+    userId: 
+    userName: 
+    displayName: 
+    organizationId: 
+    organizationKey: 
+    organizationNameKey: 
+    projectId: 
+    projectName: 
+    projectCreatedAt: 
+    projectPlatform: 
+    m_ValidAuth: 0
+    m_MigratedProject: 0
+    m_MigratedToNewConnect: 0
+  m_ServiceWindowState:
+    m_ServiceWindowState: 0
+    m_SelectedPlan: 
+  m_CrashReportingSettings:
+    m_EventUrl: https://perf-events.cloud.unity3d.com/api/events/crashes
+  m_PerformanceReportingSettings:
+    m_Enabled: 0
+    m_DashboardUrl: https://performance.unity3d.com/
+    m_EventUrl: https://perf-events.cloud.unity3d.com
+    m_CaptureLogTrace: 1
+    m_VideoCapture: 2
+    m_VideoCaptureMemoryLimit: 20
+    m_GpuCrashes: 0
+    m_NativeStackTrace: 0
+    m_LogStackTrace: 2
+  m_UnityAnalyticsSettings:
+    m_Enabled: 0
+    m_TestInitMode: 0
+    m_InitializeOnStart: 1
+  m_UnityWebSettings: {}

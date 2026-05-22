@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!30 &1
+GraphicsSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 12
+  m_Deferred:
+    m_Mode: 1
+    m_Shader: {fileID: 69, guid: 0000000000000000f000000000000000, type: 0}
+  m_DeferredReflections:
+    m_Mode: 1
+    m_Shader: {fileID: 74, guid: 0000000000000000f000000000000000, type: 0}
+  m_ScreenSpaceShadows:
+    m_Mode: 1
+    m_Shader: {fileID: 68, guid: 0000000000000000f000000000000000, type: 0}
+  m_LegacyDeferred:
+    m_Mode: 1
+    m_Shader: {fileID: 12, guid: 0000000000000000f000000000000000, type: 0}
+  m_DepthNormals:
+    m_Mode: 1
+    m_Shader: {fileID: 67, guid: 0000000000000000f000000000000000, type: 0}
+  m_MotionVectors:
+    m_Mode: 1
+    m_Shader: {fileID: 75, guid: 0000000000000000f000000000000000, type: 0}
+  m_LightHalo:
+    m_Mode: 1
+    m_Shader: {fileID: 10, guid: 0000000000000000f000000000000000, type: 0}
+  m_LensFlare:
+    m_Mode: 1
+    m_Shader: {fileID: 11, guid: 0000000000000000f000000000000000, type: 0}
+  m_CopyDepth:
+    m_Mode: 1
+    m_Shader: {fileID: 66, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sampling:
+    m_Mode: 1
+    m_Shader: {fileID: 76, guid: 0000000000000000f000000000000000, type: 0}
+  m_Fog:
+    m_Mode: 1
+    m_Shader: {fileID: 16, guid: 0000000000000000f000000000000000, type: 0}
+  m_StencilOp:
+    m_Mode: 1
+    m_Shader: {fileID: 70, guid: 0000000000000000f000000000000000, type: 0}
+  m_DeferredLighting:
+    m_Mode: 1
+    m_Shader: {fileID: 71, guid: 0000000000000000f000000000000000, type: 0}
+  m_TierSettings: []
+  m_LogWhenShaderIsCompiled: 0
+  m_CameraRelativeLightCulling: 1
+  m_CameraRelativeShadowCulling: 1
+  m_SRPDefaultSettings:
+    m_QualityTypes: []
+    m_RenderPipelineTypes: []
+    m_DefaultRenderPipeline: {fileID: 0}
+    m_DefaultRenderPipelineMobile: {fileID: 0}
+  m_MeshStencilData: []
+  m_AlbedoSwatchInfos: []
+  m_SpritesDefaultMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_MaximumTextureSize: 2048
+  m_GUISkin: {fileID: 10755, guid: 0000000000000000f000000000000000, type: 0}
+  m_TransparencySortMode: 0
+  m_TransparencySortAxis: {x: 0, y: 0, z: 1}
+  m_DefaultRenderingPath: 1
+  m_DefaultMobileRenderingPath: 1
+  m_TierLightmapBaking:
+    serializedVersion: 2
+    Tier1: 0
+    Tier2: 0
+    Tier3: 0
+  m_TierShaderHardwareTier:
+    Tier1: 1
+    Tier2: 2
+    Tier3: 3
+  m_TierLightsPerVertex:
+    Tier1: 4
+    Tier2: 4
+    Tier3: 8
+  m_PreloadedShaders: []
+  m_SpritesDefaultMaskMaterial: {fileID: 10776, guid: 0000000000000000f000000000000000, type: 0}
