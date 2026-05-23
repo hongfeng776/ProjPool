@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 几何积木旋转交互工具</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>3D 几何积木旋转交互工具</h1>
+            <div class="controls">
+                <button id="addCube">添加立方体</button>
+                <button id="addSphere">添加球体</button>
+                <button id="addCylinder">添加圆柱体</button>
+                <button id="addTorus">添加圆环</button>
+                <button id="addCone">添加圆锥体</button>
+                <button id="toggleRotate" class="active">自动旋转</button>
+                <button id="clearScene">清空场景</button>
+            </div>
+        </header>
+        <main class="main-content">
+            <div id="canvas-container"></div>
+            <aside class="sidebar">
+                <h2>属性面板</h2>
+                <div class="property-group">
+                    <label>选中物体</label>
+                    <div id="selected-object">无</div>
+                </div>
+                <div class="property-group">
+                    <label>切换几何体</label>
+                    <div class="geometry-switcher">
+                        <button class="switch-btn" data-type="cube">立方体</button>
+                        <button class="switch-btn" data-type="sphere">球体</button>
+                        <button class="switch-btn" data-type="cylinder">圆柱体</button>
+                        <button class="switch-btn" data-type="torus">圆环</button>
+                        <button class="switch-btn" data-type="cone">圆锥体</button>
+                    </div>
+                </div>
+                <div class="property-group">
+                    <label>旋转 X</label>
+                    <input type="range" id="rotateX" min="0" max="360" value="0">
+                </div>
+                <div class="property-group">
+                    <label>旋转 Y</label>
+                    <input type="range" id="rotateY" min="0" max="360" value="0">
+                </div>
+                <div class="property-group">
+                    <label>旋转 Z</label>
+                    <input type="range" id="rotateZ" min="0" max="360" value="0">
+                </div>
+                <div class="property-group">
+                    <label>缩放 (0.3 - 3)</label>
+                    <input type="range" id="scale" min="0.3" max="3" step="0.1" value="1">
+                </div>
+                <div class="property-group">
+                    <label>颜色</label>
+                    <input type="color" id="colorPicker" value="#00ff88">
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/scene.js"></script>
+</body>
+</html>

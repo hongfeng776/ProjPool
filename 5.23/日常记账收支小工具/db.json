@@ -1,0 +1,65 @@
+{
+  "transactions": [
+    {
+      "id": 1779470742905,
+      "type": "expense",
+      "category": "??",
+      "amount": 299,
+      "description": "???",
+      "date": "2026-05-20"
+    },
+    {
+      "id": 1779470742877,
+      "type": "expense",
+      "category": "??",
+      "amount": 50,
+      "description": "??",
+      "date": "2026-05-18"
+    },
+    {
+      "id": 1779470742848,
+      "type": "income",
+      "category": "??",
+      "amount": 2000,
+      "description": "????",
+      "date": "2026-05-15"
+    },
+    {
+      "id": 1779469807709,
+      "type": "income",
+      "category": "??",
+      "amount": 8000,
+      "description": "5???",
+      "date": "2026-05-20"
+    },
+    {
+      "id": 1779469793948,
+      "type": "expense",
+      "category": "??",
+      "amount": 35.5,
+      "description": "??",
+      "date": "2026-05-23"
+    }
+  ],
+  "categories": {
+    "expense": [
+      "餐饮",
+      "交通",
+      "购物",
+      "娱乐",
+      "医疗",
+      "教育",
+      "住房",
+      "其他"
+    ],
+    "income": [
+      "工资",
+      "奖金",
+      "兼职",
+      "投资",
+      "红包",
+      "退款",
+      "其他"
+    ]
+  }
+}

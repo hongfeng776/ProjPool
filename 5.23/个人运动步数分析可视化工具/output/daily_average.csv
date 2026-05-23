@@ -1,0 +1,8 @@
+﻿day_name,average_steps,median_steps,total_days,total_steps,min_steps,max_steps,std_steps,day_cn
+Monday,9653,9876,5,48265,7823,10456,1052,周一
+Tuesday,10493,10543,5,52465,9245,11567,954,周二
+Wednesday,9174,8765,5,45874,8765,10567,785,周三
+Thursday,9378,9084,4,37514,8456,10890,1057,周四
+Friday,11511,11566,4,46044,9456,13456,1678,周五
+Saturday,6494,6532,4,25976,5678,7234,636,周六
+Sunday,6833,7006,4,27335,5432,7890,1027,周日

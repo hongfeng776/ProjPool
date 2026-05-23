@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 太阳系行星浏览</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="container"></div>
+    
+    <div class="info-panel">
+        <h1>太阳系行星系统</h1>
+        <p>🖱️ 左键拖拽：旋转视角</p>
+        <p>🔍 滚轮：缩放</p>
+        <p>✋ 右键拖拽：平移</p>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
